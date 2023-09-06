@@ -1,0 +1,31 @@
+{
+  "name": "inviterelay-ui",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "prettier --plugin-search-dir . --check . && eslint .",
+    "format": "prettier --plugin-search-dir . --write ."
+  },
+  "type": "module",
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^2.0.2",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.24",
+    "sass": "^1.45.0",
+    "svelte": "^3.44.0",
+    "svelte-flatpickr": "^3.2.6",
+    "svelte-spa-router": "^3.2.0",
+    "tailwindcss": "^3.3.2",
+    "vite": "^4.0.4",
+    "@nostr-dev-kit/ndk": "^0.8.23",
+    "@tailwindcss/forms": "^0.5.3",
+    "@tailwindcss/typography": "^0.5.9",
+    "eslint-plugin-svelte": "^2.33.0",
+    "nostr-tools": "^1.14.2",
+    "prettier": "^3.0.3",
+    "prettier-plugin-svelte": "^3.0.3"
+  },
+  "dependencies": {}
+}
