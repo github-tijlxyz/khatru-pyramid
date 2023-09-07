@@ -55,7 +55,7 @@ func main() {
 	// invitedata api
 	relay.Router().HandleFunc("/invitedata", inviteDataApiHandler)
 	// ui
-	relay.Router().Handle("/", http.StripPrefix("/", http.FileServer(http.Dir("./ui/dist"))))
+	relay.Router().HandleFunc("/", embeddedUIHandler)
 
 	fmt.Println("running on :3334")
 	http.ListenAndServe(":3334", relay)
