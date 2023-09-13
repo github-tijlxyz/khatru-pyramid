@@ -37,7 +37,7 @@ func whitelistRejecter(ctx context.Context, evt *nostr.Event) (reject bool, msg 
 		pTags := evt.Tags.GetAll([]string{"p"})
 		for _, tag := range pTags {
 			for _, user := range whitelist {
-				if user.Pk == tag.Value() && user.InvitedBy == evt.PubKey {
+				if user.Pk == tag.Value() && (user.InvitedBy == evt.PubKey || evt.PubKey == relayMaster) {
 					deleteFromWhitelistRecursively(tag.Value())
 				}
 			}

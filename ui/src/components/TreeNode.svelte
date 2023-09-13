@@ -25,7 +25,7 @@
     let confirmation = confirm(
       `Are you sure you want to remove ${
         username ? username : person.pk
-      }? All people they invited will also be removed.`,
+      }? All people they invited will also be removed. (you can only do this if you invited this user or are the relay admin)`,
     );
     if (confirmation) {
       try {
@@ -34,8 +34,7 @@
         const relaySet = new NDKRelaySet(specificRelay, $ndk);
         relaySet.relays.forEach(async (relay) => {
           await relay.connect().catch((err) => {
-            console.log("RELAY CONNECT ERROR");
-            console.error(err);
+            console.log("error while connecting to relay", err);
           });
           relay.on("connect", () => {
             console.log("connected");

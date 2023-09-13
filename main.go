@@ -11,7 +11,11 @@ import (
 
 	"github.com/fiatjaf/khatru"
 	"github.com/fiatjaf/khatru/plugins/storage/badgern"
+	"github.com/joho/godotenv"
 )
+
+var relayMaster string
+var db badgern.BadgerBackend
 
 func main() {
 	// save whitelist on shutdown
@@ -30,8 +34,17 @@ func main() {
 		}
 	}()
 
+	// init env config
+	godotenv.Load(".env")
+
 	// init relay
 	relay := khatru.NewRelay()
+
+	relayMaster = os.Getenv("INVITE_MASTER")
+	relay.Name = os.Getenv("RELAY_NAME")
+	relay.Description = os.Getenv("RELAY_DESCRIPTION")
+	relay.PubKey = os.Getenv("RELAY_PUBKEY")
+	relay.Contact = os.Getenv("RELAY_CONTACT")
 
 	// load whitelist storage
 	if err := loadWhitelist(); err != nil {
@@ -39,7 +52,7 @@ func main() {
 	}
 
 	// load db
-	db := badgern.BadgerBackend{Path: "/tmp/khatru-badgern-tmp"}
+	db = badgern.BadgerBackend{Path: "/tmp/khatru-badgern-tmp"}
 	if err := db.Init(); err != nil {
 		panic(err)
 	}

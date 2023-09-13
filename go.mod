@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/fiatjaf/khatru v0.0.2
+	github.com/joho/godotenv v1.5.1
 	github.com/nbd-wtf/go-nostr v0.20.0
 )
 
