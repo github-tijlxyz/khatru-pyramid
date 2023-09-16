@@ -26,7 +26,7 @@
       });
 
       let filter = { kinds: [1984], limit: 250 };
-      let es = await $ndk.fetchEvents(filter/*, relaySet*/);
+      let es = await $ndk.fetchEvents(filter, relaySet);
       events = Array.from(es);
     } catch {
       console.log("error while getting feed", error);
