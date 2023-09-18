@@ -6,11 +6,42 @@
 
   let show = true;
 
+  async function dismissReportEvent() {
+    let confirmation = confirm(
+      "Are you sure you want to delete this event? (You can only do this if you are a relay master)",
+    );
+    if (confirmation) {
+      try {
+        // remove report event
+        // only publish to the relay in question, dont know why this needs so much code
+        let specificRelay = [new NDKRelay(relayUrl)];
+        const relaySet = new NDKRelaySet(specificRelay, $ndk);
+        relaySet.relays.forEach(async (relay) => {
+          await relay.connect().catch((err) => {
+            console.log("RELAY CONNECT ERROR");
+            console.error(err);
+          });
+          relay.on("connect", () => {
+            console.log(relay.url, "connected");
+          });
+        });
+
+        const newevent = new NDKEvent($ndk);
+        newevent.kind = 20203;
+        newevent.tags.push(["e", event.id]);
+        await newevent.publish(relaySet);
+        show = false;
+      } catch (error) {
+        console.log("error publishing event", error);
+      }
+    }
+  }
+
   async function removeUser(username, pk) {
     let confirmation = confirm(
       `Are you sure you want to remove ${
         username ? username : pk
-      }? All people they invited will also be removed. (you can only do this if you invited this user or are the relay admin)`
+      }? All people they invited will also be removed. (you can only do this if you invited this user or are the relay admin)`,
     );
     if (confirmation) {
       try {
@@ -26,10 +57,10 @@
           });
         });
 
-        const event = new NDKEvent($ndk);
-        event.kind = 20202;
-        event.tags.push(["p", pk]);
-        await event.publish(relaySet).then(() => reload());
+        const newevent = new NDKEvent($ndk);
+        newevent.kind = 20202;
+        newevent.tags.push(["p", pk]);
+        await newevent.publish(relaySet);
       } catch (error) {
         console.log("error while publishing", error);
       }
@@ -51,7 +82,7 @@
               JSON.parse(Array.from(profile)[0]?.content)?.picture}
             alt=""
           />
-          <a href={`nostr:${event.author.npub}`}
+          <a class="hover:underline" href={`nostr:${event.author.npub}`}
             >{profile && JSON.parse(Array.from(profile)[0]?.content)?.name}</a
           >
         {/await}
@@ -72,13 +103,15 @@
                 JSON.parse(Array.from(profile)[0]?.content)?.picture}
               alt=""
             />
-            <a href={`nostr:${event.tags.find((e) => e[0] == "p")?.[1]}`}
+            <a
+              class="hover:underline"
+              href={`nostr:${event.tags.find((e) => e[0] == "p")?.[1]}`}
               >{profile &&
               JSON.parse(Array.from(profile)[0]?.content)?.name.length <= 16
                 ? JSON.parse(Array.from(profile)[0]?.content)?.name
                 : JSON.parse(Array.from(profile)[0]?.content)?.name.substring(
                     0,
-                    13
+                    13,
                   ) + "..."}</a
             >
           {/await}
@@ -101,7 +134,7 @@
       <div
         class="bg-white max-h-64 max-w-full overflow-y-scroll rounded-lg m-0 p-4 mt-2"
       >
-        {#await $ndk.fetchEvent( { ids: [event?.tags.find((e) => e[0] == "e")?.[1]] } )}
+        {#await $ndk.fetchEvent( { ids: [event?.tags.find((e) => e[0] == "e")?.[1]] }, )}
           <p class="text-gray-500 p-0 m-0">... (can we find this event?)</p>
         {:then theevent}
           <p class="m-0 p-0">{theevent.content}</p>
@@ -130,22 +163,17 @@
           Open in client
         </a>
         <button
-          class="rounded-lg inline bg-slate-100 p-2 cursor-pointer hover:bg-white"
-        >
-          View in invite tree
-        </button>
-        <button
-          on:click={() => (show = false)}
+          on:click={dismissReportEvent}
           class="rounded-lg inline bg-green-500 p-2 cursor-pointer hover:bg-green-400"
         >
-          Dismiss <!-- TO BE IMPLEMENTED: Remove report event? -->
+          Remove This Report Event
         </button>
         <button
           on:click={() =>
             removeUser("user", event.tags.find((e) => e[0] == "p")?.[1])}
           class="rounded-lg inline bg-red-500 p-2 cursor-pointer hover:bg-red-400"
         >
-          Exlude this user
+          Exlude reported user
         </button>
       </div>
     </div>

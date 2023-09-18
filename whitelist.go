@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"os"
 
 	"github.com/nbd-wtf/go-nostr"
@@ -22,23 +23,43 @@ func whitelistRejecter(ctx context.Context, evt *nostr.Event) (reject bool, msg 
 		return true, "You are not invited to this relay"
 	}
 	
-	// add user(s) if needed
+	// 20201 = user invites new user
 	if (evt.Kind == 20201) {
 		pTags := evt.Tags.GetAll([]string{"p"})
 		for _, tag := range pTags {
 			if !isPkInWhitelist(tag.Value()) {
-				whitelist = append(whitelist, User{Pk: tag.Value(), InvitedBy: evt.PubKey})
+				if nostr.IsValidPublicKeyHex(tag.Value()) {
+					whitelist = append(whitelist, User{Pk: tag.Value(), InvitedBy: evt.PubKey})
+				}
 			}
 		}
 	}
 
-	// remove user(s) if needed
+	// 20202 = user removes user they invited or admin removes invite
 	if (evt.Kind == 20202) {
 		pTags := evt.Tags.GetAll([]string{"p"})
 		for _, tag := range pTags {
 			for _, user := range whitelist {
 				if user.Pk == tag.Value() && (user.InvitedBy == evt.PubKey || evt.PubKey == relayMaster) {
-					deleteFromWhitelistRecursively(tag.Value())
+					deleteFromWhitelistRecursively(ctx, tag.Value())
+				}
+			}
+		}
+	}
+
+	// 20203 = admin deletes event
+	if (evt.Kind == 20203 && evt.PubKey == relayMaster) {
+		eTags := evt.Tags.GetAll([]string{"e"})
+		for _, tag := range eTags { 
+			filter := nostr.Filter{
+				IDs: []string{tag.Value()},
+			}
+			events, _ := db.QueryEvents(ctx, filter);
+
+			for ev := range events {
+				err := db.DeleteEvent(ctx, ev)
+				if err != nil {
+					log.Println("error while deleting event", err)
 				}
 			}
 		}

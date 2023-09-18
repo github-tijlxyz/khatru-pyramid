@@ -1,4 +1,4 @@
-<script lang="js">
+<script>
   import { NDKEvent, NDKRelay, NDKRelaySet } from "@nostr-dev-kit/ndk";
   import { ndk } from "../lib/nostr";
   import { nip19 } from "nostr-tools";

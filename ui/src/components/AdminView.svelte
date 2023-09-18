@@ -1,12 +1,9 @@
-<script lang="js">
-  import {
-    NDKRelay,
-    NDKRelaySet,
-  } from "@nostr-dev-kit/ndk";
+<script>
+  import { NDKRelay, NDKRelaySet } from "@nostr-dev-kit/ndk";
   import { ndk } from "../lib/nostr";
   import { onMount } from "svelte";
   import ReportEvent from "./ReportEvent.svelte";
-  import { relayUrl } from '../lib/consts';
+  import { relayUrl } from "../lib/consts";
 
   let events = [];
 
@@ -17,18 +14,18 @@
       const relaySet = new NDKRelaySet(specificRelay, $ndk);
       relaySet.relays.forEach(async (relay) => {
         await relay.connect().catch((err) => {
-          console.log("RELAY CONNECT ERROR");
-          console.error(err);
+          console.log("error while connecting to relay", err);
         });
         relay.on("connect", () => {
-          console.log(relay.url, "connected");
+          console.log("connected");
         });
       });
 
       let filter = { kinds: [1984], limit: 250 };
-      let es = await $ndk.fetchEvents(filter, relaySet);
+      let options = { closeOnEose: true };
+      let es = await $ndk.fetchEvents(filter, options, relaySet);
       events = Array.from(es);
-    } catch {
+    } catch (error) {
       console.log("error while getting feed", error);
     }
   });
@@ -36,8 +33,9 @@
 
 <div>
   {#each events as event}
-  {#if event.relay.url == relayUrl}
     <ReportEvent {event} />
-  {/if}
   {/each}
+  {#if events.length == 0}
+    <span>Didn't found any events</span>
+  {/if}
 </div>

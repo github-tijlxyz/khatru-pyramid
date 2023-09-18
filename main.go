@@ -40,7 +40,7 @@ func main() {
 	// init relay
 	relay := khatru.NewRelay()
 
-	relayMaster = os.Getenv("INVITE_MASTER")
+	relayMaster = os.Getenv("INVITE_RELAY_MASTER")
 	relay.Name = os.Getenv("RELAY_NAME")
 	relay.Description = os.Getenv("RELAY_DESCRIPTION")
 	relay.PubKey = os.Getenv("RELAY_PUBKEY")
@@ -52,7 +52,7 @@ func main() {
 	}
 
 	// load db
-	db = badgern.BadgerBackend{Path: "/tmp/khatru-badgern-tmp"}
+	db = badgern.BadgerBackend{Path: "./khatru-badgern-db"}
 	if err := db.Init(); err != nil {
 		panic(err)
 	}
@@ -62,11 +62,12 @@ func main() {
 	relay.CountEvents = append(relay.CountEvents, db.CountEvents)
 	relay.DeleteEvent = append(relay.DeleteEvent, db.DeleteEvent)
 
-
 	relay.RejectEvent = append(relay.RejectEvent, whitelistRejecter)
 
 	// invitedata api
 	relay.Router().HandleFunc("/invitedata", inviteDataApiHandler)
+	relay.Router().HandleFunc("/relaymaster", relayMasterApiHandler)
+	
 	// ui
 	relay.Router().HandleFunc("/", embeddedUIHandler)
 

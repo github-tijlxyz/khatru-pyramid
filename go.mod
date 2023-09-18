@@ -1,15 +1,16 @@
 module github.com/github-tijlxyz/khatru-invite
 
-go 1.20
+go 1.21.1
 
 require (
-	github.com/fiatjaf/khatru v0.0.2
+	github.com/fiatjaf/khatru v0.0.0-20230916185141-24d1e3aebd67
 	github.com/joho/godotenv v1.5.1
 	github.com/nbd-wtf/go-nostr v0.20.0
 )
 
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
+	github.com/bmatsuo/lmdb-go v1.8.0 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.3.2 // indirect
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.0.2 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
@@ -28,9 +29,11 @@ require (
 	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/flatbuffers v1.12.1 // indirect
+	github.com/jmoiron/sqlx v1.3.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.16.5 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
+	github.com/mattn/go-sqlite3 v1.14.6 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/puzpuzpuz/xsync v1.5.2 // indirect
 	github.com/rs/cors v1.7.0 // indirect

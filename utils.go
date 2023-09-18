@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 
 	"github.com/nbd-wtf/go-nostr"
 )
@@ -15,7 +16,7 @@ func isPkInWhitelist(targetPk string) bool {
     return false
 }
 
-func deleteFromWhitelistRecursively (target string) {
+func deleteFromWhitelistRecursively (ctx context.Context, target string) {
 	var updatedWhitelist []User
 	var queue []string
 
@@ -31,18 +32,19 @@ func deleteFromWhitelistRecursively (target string) {
 	whitelist = updatedWhitelist
 
 	// Remove all events
-	go func () {
-		var filter nostr.Filter = nostr.Filter{
-			Authors: []string{target},
+	filter := nostr.Filter{
+		Authors: []string{target},
+	}
+	events, _ := db.QueryEvents(ctx, filter)
+	for ev := range events {
+		err := db.DeleteEvent(ctx, ev)
+		if err != nil {
+			log.Println("error while deleting event", err)
 		}
-		events, _ := db.QueryEvents(context.TODO(), filter)
-		for ev := range events {
-			db.DeleteEvent(context.TODO(), ev)
-		}
-	}()
+	}
 
 	// Recursive
 	for _, pk := range queue {
-		deleteFromWhitelistRecursively(pk)
+		deleteFromWhitelistRecursively(ctx, pk)
 	}
 }

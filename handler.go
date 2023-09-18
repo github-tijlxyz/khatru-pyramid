@@ -7,20 +7,6 @@ import (
 	"strings"
 )
 
-func inviteDataApiHandler(w http.ResponseWriter, re *http.Request) {
-    jsonBytes, err := json.Marshal(whitelist)
-	if err != nil {
-		http.Error(w, "internal server error", http.StatusInternalServerError)
-		return
-	}
-    w.Header().Set("Content-Type", "application/json")
-    w.Header().Set("Access-Control-Allow-Origin", "*")
-    w.WriteHeader(http.StatusOK)
-    if _, err := w.Write(jsonBytes); err != nil {
-		http.Error(w, "internal server error", http.StatusInternalServerError)
-	}	
-}
-
 // embed ui files
 //go:embed ui/dist/*
 var uiContent embed.FS
@@ -51,4 +37,32 @@ func embeddedUIHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+}
+
+func inviteDataApiHandler(w http.ResponseWriter, re *http.Request) {
+    jsonBytes, err := json.Marshal(whitelist)
+	if err != nil {
+		http.Error(w, "internal server error 00", http.StatusInternalServerError)
+		return
+	}
+    w.Header().Set("Content-Type", "application/json")
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+    w.WriteHeader(http.StatusOK)
+    if _, err := w.Write(jsonBytes); err != nil {
+		http.Error(w, "internal server error 01", http.StatusInternalServerError)
+	}	
+}
+
+func relayMasterApiHandler(w http.ResponseWriter, re *http.Request) {
+    jsonBytes, err := json.Marshal(relayMaster)
+	if err != nil {
+		http.Error(w, "internal server error 10", http.StatusInternalServerError)
+		return
+	}
+    w.Header().Set("Content-Type", "application/json")
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+    w.WriteHeader(http.StatusOK)
+    if _, err := w.Write(jsonBytes); err != nil {
+		http.Error(w, "internal server error 11", http.StatusInternalServerError)
+	}	
 }

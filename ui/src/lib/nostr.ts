@@ -10,3 +10,4 @@ Ndk.connect().then(() => console.log("ndk connected"));
 
 export const ndk: Writable<NDK> = writable(Ndk);
 export const userPublickey: Writable<string | undefined> = writable(undefined);
+export const relayMaster: Writable<string> = writable("");
