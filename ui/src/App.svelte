@@ -1,6 +1,6 @@
 <script lang="ts">
   import "./App.css";
-  import Hieracy from "./components/Hierarchy.svelte";
+  import Hierarchy from "./components/Hierarchy.svelte";
   import Invite from "./components/Invite.svelte";
   import { onMount } from "svelte";
   import { ndk, relayMaster, userPublickey } from "./lib/nostr";
@@ -88,9 +88,9 @@
       </div>
     {/if}
     <div>
-      <h3>Current hieracy</h3>
+      <h3>Current Hierarchy</h3>
       <div>
-        <Hieracy {hierarchy} reload={fetchData} />
+        <Hierarchy {hierarchy} reload={fetchData} />
       </div>
     </div>
   {/if}

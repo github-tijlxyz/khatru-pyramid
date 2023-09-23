@@ -41,10 +41,11 @@ func main() {
 	relay := khatru.NewRelay()
 
 	relayMaster = os.Getenv("INVITE_RELAY_MASTER")
-	relay.Name = os.Getenv("RELAY_NAME")
-	relay.Description = os.Getenv("RELAY_DESCRIPTION")
-	relay.PubKey = os.Getenv("RELAY_PUBKEY")
-	relay.Contact = os.Getenv("RELAY_CONTACT")
+	
+	// add information here!
+	relay.Name = "a invite relay"
+	relay.PubKey = ""
+	relay.Contact = ""
 
 	// load whitelist storage
 	if err := loadWhitelist(); err != nil {

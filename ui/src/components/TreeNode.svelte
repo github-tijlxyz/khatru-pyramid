@@ -1,6 +1,6 @@
 <script lang="js">
   import { onMount } from "svelte";
-  import { ndk, userPublickey } from "../lib/nostr";
+  import { ndk, relayMaster, userPublickey } from "../lib/nostr";
   import TreeNode from "./TreeNode.svelte";
   import { nip19 } from "nostr-tools";
   import { NDKEvent, NDKRelay, NDKRelaySet, NDKUser } from "@nostr-dev-kit/ndk";
@@ -59,7 +59,7 @@
       href={`nostr:${nip19.npubEncode(person.pk)}`}
       >{#if username}{username}{:else}{nip19.npubEncode(person.pk)}{/if}</a
     >
-    {#if $userPublickey == nip19.npubEncode(person.invited_by)}<button
+    {#if $userPublickey == nip19.npubEncode(person.invited_by) || $userPublickey == $relayMaster}<button
         on:click={removeThisUser}
         class="inline cusor-pointer font-semibold text-red-500">[-]</button
       >{/if}{#if $userPublickey == nip19.npubEncode(person.pk)}
