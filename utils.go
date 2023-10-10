@@ -2,22 +2,47 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"html/template"
 	"log"
 
 	"github.com/nbd-wtf/go-nostr"
 )
 
-func isPkInWhitelist(targetPk string) bool {
-    for i := 0; i < len(whitelist); i++ {
-        if whitelist[i].Pk == targetPk {
-            return true
-        }
-    }
-    return false
+func buildHTMLTree(entries []WhitelistEntry, invitedBy string) template.HTML {
+	html := "<ul>"
+
+	for _, entry := range entries {
+		if entry.InvitedBy == invitedBy {
+			user := getUserInfo(context.TODO(), entry.Pk)
+			html += fmt.Sprintf(`
+			<li>
+			<a class="user" href="nostr:%s">%s</a>
+			<a data-actionarg='[["p", "%v"]]' class="rembtn removefromrelay">x</a>
+			%s
+			</li>`, template.HTMLEscapeString(user.Npub),
+				template.HTMLEscapeString(user.Name),
+				entry.Pk,
+				buildHTMLTree(entries, entry.Pk))
+		}
+	}
+
+	html += "</ul>"
+	return template.HTML(html)
 }
 
-func deleteFromWhitelistRecursively (ctx context.Context, target string) {
-	var updatedWhitelist []User
+func isPkInWhitelist(targetPk string) bool {
+	for i := 0; i < len(whitelist); i++ {
+		if whitelist[i].Pk == targetPk {
+			return true
+		}
+	}
+	return false
+}
+
+func deleteFromWhitelistRecursively(ctx context.Context, target string) {
+	var updatedWhitelist []WhitelistEntry
 	var queue []string
 
 	// Remove from whitelist
@@ -26,7 +51,7 @@ func deleteFromWhitelistRecursively (ctx context.Context, target string) {
 			updatedWhitelist = append(updatedWhitelist, user)
 		}
 		if user.InvitedBy == target {
-			queue = append(queue, user.Pk);
+			queue = append(queue, user.Pk)
 		}
 	}
 	whitelist = updatedWhitelist
@@ -47,4 +72,35 @@ func deleteFromWhitelistRecursively (ctx context.Context, target string) {
 	for _, pk := range queue {
 		deleteFromWhitelistRecursively(ctx, pk)
 	}
+}
+
+func getProfileInfoFromJson(jsonStr string) (string, string) {
+	fieldOrder := []string{"displayName", "display_name", "username", "name"}
+
+	var data map[string]interface{}
+	err := json.Unmarshal([]byte(jsonStr), &data)
+	if err != nil {
+		fmt.Println("Error parsing JSON:", err)
+		return "", ""
+	}
+
+	var displayname string = "..."
+	var picture string = ""
+
+	for _, fieldName := range fieldOrder {
+		if val, ok := data[fieldName]; ok {
+			if strVal, ok := val.(string); ok && strVal != "" {
+				if fieldName == "picture" {
+					picture = strVal
+				}
+				if fieldName == "name" {
+					displayname = strVal
+				} else if displayname == "" {
+					displayname = strVal
+				}
+			}
+		}
+	}
+
+	return displayname, picture
 }

@@ -1,16 +1,32 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Invite Relay</title>
-    <link rel="icon" href="data:," />
-    <meta name="description" content="Invite Relay UI" />
-  </head>
+<!DOCTYPE html>
+<html>
 
-  <body>
-    <noscript>Please enable JavaScript to run this app.</noscript>
-    <div id="app"></div>
-    <script type="module" src="./src/main.js"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{.Relaydescription}}">
+    <script src="./src/lib/main.ts" type="module"></script>
+    <title>{{.Relayname}} | {{.Pagetitle}}</title>
+</head>
+
+<body>
+    <div>
+        <h1>{{.Relayname}}</h1>
+        <p>{{.Relaydescription}}</p>
+    </div>
+    <hr />
+    <div>
+        <span>
+            <a href="/">information</a> - 
+            <a href="/users">invite tree</a> - 
+            <a href="/reports">admin reports viewer</a>
+        </span>
+    </div>
+    <hr />
+    <br />
+    <div>
+        {{.Pagecontent}}
+    </div>
+</body>
+
 </html>

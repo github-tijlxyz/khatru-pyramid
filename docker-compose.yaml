@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  khatru-invite:
+    restart: unless-stopped
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3335:3334
+    volumes:
+      - ./whitelist.json:/app/whitelist.json
+      - ./khatru-badgern-db:/app/khatru-badgern-db
+    env_file:
+      - .env

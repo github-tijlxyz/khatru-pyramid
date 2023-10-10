@@ -1,0 +1,9 @@
+.inline {
+  display: inline;
+}
+
+.rembtn {
+  margin-left: 1px;
+  color: red;
+  cursor: pointer;
+}

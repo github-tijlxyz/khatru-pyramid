@@ -1,24 +1,199 @@
 package main
 
 import (
+	"context"
 	"embed"
-	"encoding/json"
+	"fmt"
+	"html/template"
 	"net/http"
 	"strings"
+
+	"github.com/nbd-wtf/go-nostr"
 )
 
 // embed ui files
+
 //go:embed ui/dist/*
-var uiContent embed.FS
+var dist embed.FS
 
-func embeddedUIHandler(w http.ResponseWriter, r *http.Request) {
-	path := "ui/dist" + r.URL.Path
+func inviteTreeHandler(w http.ResponseWriter, r *http.Request) {
+	formattedInviteData := buildHTMLTree(whitelist, "")
 
-	if r.URL.Path == "/" {
-		path = "ui/dist/index.html"
+	data := map[string]interface{}{
+		"Relayname":        relayName,
+		"Relaydescription": relayDescription,
+		"Pagetitle":        "Invite Hierarchy",
+		"Pagecontent": `
+		<input type="text" id="inviteuser-input" placeholder="npub1..." /><button class="inviteuser">Invite!</button>
+		` + formattedInviteData,
 	}
 
-	data, err := uiContent.ReadFile(path)
+	tmpl, err := template.ParseFS(dist, "ui/dist/index.html")
+	if err != nil {
+		http.Error(w, "Error parsing template: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		http.Error(w, "Error executing template: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func reportsViewerHandler(w http.ResponseWriter, r *http.Request) {
+	var formattedReportsData template.HTML = ""
+
+	events, _ := db.QueryEvents(context.Background(), nostr.Filter{
+		Kinds: []int{1984},
+		Limit: 52,
+	})
+
+	type Report struct {
+		ID         string
+		ByUser     string
+		AboutUser  string
+		AboutEvent string
+		Type       string
+		Content    string
+	}
+
+	for ev := range events {
+		pTag := ev.Tags.GetFirst([]string{"p"})
+
+		eTag := ev.Tags.GetFirst([]string{"e"})
+		if pTag != nil {
+			var typeReport = eTag.Relay()[6:]
+			if typeReport == "" {
+				typeReport = pTag.Relay()[6:]
+			}
+			report := Report{
+				ID:         ev.ID,
+				ByUser:     ev.PubKey,
+				AboutUser:  pTag.Value(),
+				AboutEvent: eTag.Value(),
+				Type:       typeReport,
+				Content:    ev.Content,
+			}
+			// get AboutEvent content, note1 ect
+			formattedReportsData += template.HTML(fmt.Sprintf(`
+			<div>
+			<p><b>Report %v</b></p>
+			<p>By User: <a class="user" href="nostr:%v">%v</a></p>
+			<p>About User: <a class="user" href="nostr:%v">%v</a></p>`,
+				report.ID,
+				getUserInfo(context.Background(), report.ByUser).Npub,
+				getUserInfo(context.Background(), report.ByUser).Name,
+				getUserInfo(context.Background(), report.AboutUser).Npub,
+				getUserInfo(context.Background(), report.AboutUser).Name,
+			))
+			if report.AboutEvent != "" {
+				// fetch event data
+				aboutEvents, _ := db.QueryEvents(context.TODO(), nostr.Filter{
+					IDs: []string{report.AboutEvent},
+				})
+				for aboutEvent := range aboutEvents {
+					formattedReportsData += template.HTML(fmt.Sprintf(`
+					<p>
+					About Event: <ul>
+					<p>Kind: %v</p>
+					<p>Tags: %v</p>
+					<p>Content: %v</p>
+					</ul>
+					</p>`,
+						template.HTMLEscaper(aboutEvent.Kind),
+						template.HTMLEscaper(aboutEvent.Tags),
+						template.HTMLEscaper(aboutEvent.Content),
+					))
+				}
+			}
+			formattedReportsData += template.HTML(fmt.Sprintf(`
+			<p>Type: %v</p>`,
+				report.Type,
+			))
+			if report.Content != "" {
+				formattedReportsData += template.HTML(fmt.Sprintf(`
+				<p>Content: %v</p>
+				<div>
+				<button data-actionarg='[["e", "%v"],["p", "%v"]]' class="removefromrelay">Ban Reported User and Remove Report</button>
+				<button data-actionarg='[["e", "%v"]]' class="removefromrelay">Remove This Report</button>
+				<button data-actionarg='[["p", "%v"]]' class="removefromrelay">Ban User who wrote report</button>
+				</div>
+				</div>
+				<hr />`,
+					template.HTMLEscaper(report.Content),
+					template.HTMLEscaper(report.ID),
+					template.HTMLEscaper(report.AboutUser),
+					template.HTMLEscaper(report.ID),
+					template.HTMLEscaper(report.ByUser),
+				))
+			}
+		}
+	}
+
+	data := map[string]interface{}{
+		"Relayname":        relayName,
+		"Relaydescription": relayDescription,
+		"Pagetitle":        "Reports Viewer",
+		"Pagecontent":      formattedReportsData,
+	}
+
+	tmpl, err := template.ParseFS(dist, "ui/dist/index.html")
+	if err != nil {
+		http.Error(w, "Error parsing template: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Execute the template with the provided data and write it to the response
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		http.Error(w, "Error executing template: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func homePageHandler(w http.ResponseWriter, r *http.Request) {
+	relayOwnerInfo := getUserInfo(context.Background(), relayPubkey)
+
+	data := map[string]interface{}{
+		"Relayname":        relayName,
+		"Relaydescription": relayDescription,
+		"Pagetitle":        "Info",
+		"Pagecontent": template.HTML(fmt.Sprintf(`
+		<div>Relay Name: %v</div>
+		<div>Relay Description: %v</div>
+		<div>Relay Owner: <a class="user" href="nostr:%v">%v</a></div>
+		<div>Relay Alternative Contact: %v</div>
+		<br />
+		<div><sub>This relay uses <a target="_blank" rel="noopener noreferrer" href="https://github.com/github-tijlxyz/khatru-invite">Khatru Invite</a>, which is build with <a target="_blank" rel="noopener noreferrer" href="https://github.com/fiatjaf/khatru">Khatru</a></sub></div>
+		`, relayName, relayDescription, relayOwnerInfo.Npub, relayOwnerInfo.Name, relayContact)),
+	}
+
+	tmpl, err := template.ParseFS(dist, "ui/dist/index.html")
+	if err != nil {
+		http.Error(w, "Error parsing template: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		http.Error(w, "Error executing template: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func redirectHandler(w http.ResponseWriter, r *http.Request) {
+	if strings.HasPrefix(r.URL.Path, "/assets") {
+		staticHandler("ui/dist", w, r)
+	} else if r.URL.Path == "/" {
+		homePageHandler(w, r)
+	}
+}
+
+func staticHandler(prefix string, w http.ResponseWriter, r *http.Request) {
+	path := prefix + r.URL.Path
+
+	data, err := dist.ReadFile(path)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
@@ -37,32 +212,4 @@ func embeddedUIHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-}
-
-func inviteDataApiHandler(w http.ResponseWriter, re *http.Request) {
-    jsonBytes, err := json.Marshal(whitelist)
-	if err != nil {
-		http.Error(w, "internal server error 00", http.StatusInternalServerError)
-		return
-	}
-    w.Header().Set("Content-Type", "application/json")
-    w.Header().Set("Access-Control-Allow-Origin", "*")
-    w.WriteHeader(http.StatusOK)
-    if _, err := w.Write(jsonBytes); err != nil {
-		http.Error(w, "internal server error 01", http.StatusInternalServerError)
-	}	
-}
-
-func relayMasterApiHandler(w http.ResponseWriter, re *http.Request) {
-    jsonBytes, err := json.Marshal(relayMaster)
-	if err != nil {
-		http.Error(w, "internal server error 10", http.StatusInternalServerError)
-		return
-	}
-    w.Header().Set("Content-Type", "application/json")
-    w.Header().Set("Access-Control-Allow-Origin", "*")
-    w.WriteHeader(http.StatusOK)
-    if _, err := w.Write(jsonBytes); err != nil {
-		http.Error(w, "internal server error 11", http.StatusInternalServerError)
-	}	
 }

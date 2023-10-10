@@ -14,8 +14,14 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var relayMaster string
-var db badgern.BadgerBackend
+var (
+	relayMaster      string
+	db               badgern.BadgerBackend
+	relayName        string = ""
+	relayPubkey      string = ""
+	relayDescription string = "none"
+	relayContact     string = "none"
+)
 
 func main() {
 	// save whitelist on shutdown
@@ -41,11 +47,17 @@ func main() {
 	relay := khatru.NewRelay()
 
 	relayMaster = os.Getenv("INVITE_RELAY_MASTER")
-	
+
 	// add information here!
-	relay.Name = "a invite relay"
-	relay.PubKey = ""
-	relay.Contact = ""
+	relayName = os.Getenv("RELAY_NAME")
+	relayPubkey = os.Getenv("RELAY_PUBKEY")
+	relayDescription = os.Getenv("RELAY_DESCRIPTION")
+	relayContact = os.Getenv("RELAY_CONTACT")
+
+	relay.Name = relayName
+	relay.PubKey = relayPubkey
+	relay.Description = relayDescription
+	relay.Contact = relayContact
 
 	// load whitelist storage
 	if err := loadWhitelist(); err != nil {
@@ -65,12 +77,10 @@ func main() {
 
 	relay.RejectEvent = append(relay.RejectEvent, whitelistRejecter)
 
-	// invitedata api
-	relay.Router().HandleFunc("/invitedata", inviteDataApiHandler)
-	relay.Router().HandleFunc("/relaymaster", relayMasterApiHandler)
-	
 	// ui
-	relay.Router().HandleFunc("/", embeddedUIHandler)
+	relay.Router().HandleFunc("/reports", reportsViewerHandler)
+	relay.Router().HandleFunc("/users", inviteTreeHandler)
+	relay.Router().HandleFunc("/", redirectHandler)
 
 	fmt.Println("running on :3334")
 	http.ListenAndServe(":3334", relay)
@@ -78,9 +88,9 @@ func main() {
 
 // save whitelist on shutdown
 func handleSignals() {
-    sigCh := make(chan os.Signal, 1)
-    signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
-    <-sigCh
-    saveWhitelist()
-    os.Exit(0)
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
+	<-sigCh
+	saveWhitelist()
+	os.Exit(0)
 }
