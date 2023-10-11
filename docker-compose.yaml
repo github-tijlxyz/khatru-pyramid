@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - 3335:3334
+      - 3334:3334
     volumes:
       - ./whitelist.json:/app/whitelist.json
       - ./khatru-badgern-db:/app/khatru-badgern-db

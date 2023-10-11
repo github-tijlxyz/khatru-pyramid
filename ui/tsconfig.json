@@ -6,26 +6,15 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
 
-    // added
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-
-    /* Bundler mode */
-    // "moduleResolution": "Bundler",
-    // "allowImportingTsExtensions": true,
     "noEmit": true,
 
-    "allowJs": true,
-    "paths": {
-      "lib/*": ["./src/lib/*"],
-    },
-
     /* Linting */
-    "strict": false,
+    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true

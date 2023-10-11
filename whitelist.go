@@ -23,7 +23,10 @@ func whitelistRejecter(ctx context.Context, evt *nostr.Event) (reject bool, msg 
 		return true, "You are not invited to this relay"
 	}
 
-	// 20201 = user invites new user
+	/*
+	 kind 20201
+	 invited/whitelisted user invites new user
+	*/
 	if evt.Kind == 20201 {
 		pTags := evt.Tags.GetAll([]string{"p"})
 		for _, tag := range pTags {
@@ -35,9 +38,11 @@ func whitelistRejecter(ctx context.Context, evt *nostr.Event) (reject bool, msg 
 		}
 	}
 
-	// 20202
-	// p tag = user removes user they invited or admin removes user
-	// e tag = admin removes event
+	/*
+	 kind 20202
+	 p tag = user removes user they invited OR admin removes user
+	 e tag = admin removes event
+	*/
 	if evt.Kind == 20202 {
 		pTags := evt.Tags.GetAll([]string{"p"})
 		for _, tag := range pTags {
@@ -62,7 +67,7 @@ func whitelistRejecter(ctx context.Context, evt *nostr.Event) (reject bool, msg 
 				events, _ := db.QueryEvents(ctx, filter)
 
 				for ev := range events {
-					log.Println("deleting evemt", ev.ID)
+					log.Println("deleting event", ev.ID)
 					err := db.DeleteEvent(ctx, ev)
 					if err != nil {
 						log.Println("error while deleting event", err)
