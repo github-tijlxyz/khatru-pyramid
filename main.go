@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,18 +11,30 @@ import (
 	"github.com/fiatjaf/khatru"
 	"github.com/fiatjaf/khatru/plugins/storage/badgern"
 	"github.com/joho/godotenv"
+	"github.com/kelseyhightower/envconfig"
+	"github.com/rs/zerolog"
 )
 
+type Settings struct {
+	RelayName        string `envconfig:"RELAY_NAME" required:"true"`
+	RelayPubkey      string `envconfig:"RELAY_PUBKEY" required:"true"`
+	RelayDescription string `envconfig:"RELAY_DESCRIPTION"`
+	RelayContact     string `envconfig:"RELAY_CONTACT"`
+}
+
 var (
-	relayMaster      string
-	db               badgern.BadgerBackend
-	relayName        string = ""
-	relayPubkey      string = ""
-	relayDescription string = "none"
-	relayContact     string = "none"
+	db  badgern.BadgerBackend
+	s   Settings
+	log = zerolog.New(os.Stderr).Output(zerolog.ConsoleWriter{Out: os.Stdout}).With().Timestamp().Logger()
 )
 
 func main() {
+	err := envconfig.Process("", &s)
+	if err != nil {
+		log.Fatal().Err(err).Msg("couldn't process envconfig")
+		return
+	}
+
 	// save whitelist on shutdown
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -46,18 +57,10 @@ func main() {
 	// init relay
 	relay := khatru.NewRelay()
 
-	relayMaster = os.Getenv("INVITE_RELAY_MASTER")
-
-	// add information here!
-	relayName = os.Getenv("RELAY_NAME")
-	relayPubkey = os.Getenv("RELAY_PUBKEY")
-	relayDescription = os.Getenv("RELAY_DESCRIPTION")
-	relayContact = os.Getenv("RELAY_CONTACT")
-
-	relay.Name = relayName
-	relay.PubKey = relayPubkey
-	relay.Description = relayDescription
-	relay.Contact = relayContact
+	relay.Name = s.RelayName
+	relay.PubKey = s.RelayPubkey
+	relay.Description = s.RelayDescription
+	relay.Contact = s.RelayContact
 
 	// load whitelist storage
 	if err := loadWhitelist(); err != nil {
@@ -82,7 +85,7 @@ func main() {
 	relay.Router().HandleFunc("/users", inviteTreeHandler)
 	relay.Router().HandleFunc("/", redirectHandler)
 
-	fmt.Println("running on :3334")
+	log.Info().Msg("running on http://127.0.0.1:3334")
 	http.ListenAndServe(":3334", relay)
 }
 

@@ -20,8 +20,8 @@ func inviteTreeHandler(w http.ResponseWriter, r *http.Request) {
 	formattedInviteData := buildHTMLTree(whitelist, "")
 
 	data := map[string]interface{}{
-		"Relayname":        relayName,
-		"Relaydescription": relayDescription,
+		"Relayname":        s.RelayName,
+		"Relaydescription": s.RelayDescription,
 		"Pagetitle":        "Invite Hierarchy",
 		"Pagecontent": `
 		<input type="text" id="inviteuser-input" placeholder="npub1..." /><button class="inviteuser">Invite!</button>
@@ -63,7 +63,7 @@ func reportsViewerHandler(w http.ResponseWriter, r *http.Request) {
 
 		eTag := ev.Tags.GetFirst([]string{"e"})
 		if pTag != nil {
-			var typeReport = eTag.Relay()[6:]
+			typeReport := eTag.Relay()[6:]
 			if typeReport == "" {
 				typeReport = pTag.Relay()[6:]
 			}
@@ -132,8 +132,8 @@ func reportsViewerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := map[string]interface{}{
-		"Relayname":        relayName,
-		"Relaydescription": relayDescription,
+		"Relayname":        s.RelayName,
+		"Relaydescription": s.RelayDescription,
 		"Pagetitle":        "Reports Viewer",
 		"Pagecontent":      formattedReportsData,
 	}
@@ -153,11 +153,11 @@ func reportsViewerHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
-	relayOwnerInfo := getUserInfo(context.Background(), relayPubkey)
+	relayOwnerInfo := getUserInfo(context.Background(), s.RelayPubkey)
 
 	data := map[string]interface{}{
-		"Relayname":        relayName,
-		"Relaydescription": relayDescription,
+		"Relayname":        s.RelayName,
+		"Relaydescription": s.RelayDescription,
 		"Pagetitle":        "Info",
 		"Pagecontent": template.HTML(fmt.Sprintf(`
 		<div>Relay Name: %v</div>
@@ -166,7 +166,7 @@ func homePageHandler(w http.ResponseWriter, r *http.Request) {
 		<div>Relay Alternative Contact: %v</div>
 		<br />
 		<div><sub>This relay uses <a target="_blank" rel="noopener noreferrer" href="https://github.com/github-tijlxyz/khatru-invite">Khatru Invite</a>, which is build with <a target="_blank" rel="noopener noreferrer" href="https://github.com/fiatjaf/khatru">Khatru</a></sub></div>
-		`, relayName, relayDescription, relayOwnerInfo.Npub, relayOwnerInfo.Name, relayContact)),
+		`, s.RelayName, s.RelayDescription, relayOwnerInfo.Npub, relayOwnerInfo.Name, s.RelayContact)),
 	}
 
 	tmpl, err := template.ParseFS(dist, "ui/dist/index.html")

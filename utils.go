@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"log"
 
 	"github.com/nbd-wtf/go-nostr"
 )
@@ -15,7 +14,7 @@ func buildHTMLTree(entries []WhitelistEntry, invitedBy string) template.HTML {
 
 	for _, entry := range entries {
 		if entry.InvitedBy == invitedBy {
-			user := getUserInfo(context.TODO(), entry.Pk)
+			user := getUserInfo(context.TODO(), entry.PublicKey)
 			html += fmt.Sprintf(`
 			<li>
 			<a class="user" href="nostr:%s">%s</a>
@@ -23,8 +22,8 @@ func buildHTMLTree(entries []WhitelistEntry, invitedBy string) template.HTML {
 			%s
 			</li>`, template.HTMLEscapeString(user.Npub),
 				template.HTMLEscapeString(user.Name),
-				entry.Pk,
-				buildHTMLTree(entries, entry.Pk))
+				entry.PublicKey,
+				buildHTMLTree(entries, entry.PublicKey))
 		}
 	}
 
@@ -34,7 +33,7 @@ func buildHTMLTree(entries []WhitelistEntry, invitedBy string) template.HTML {
 
 func isPkInWhitelist(targetPk string) bool {
 	for i := 0; i < len(whitelist); i++ {
-		if whitelist[i].Pk == targetPk {
+		if whitelist[i].PublicKey == targetPk {
 			return true
 		}
 	}
@@ -47,11 +46,11 @@ func deleteFromWhitelistRecursively(ctx context.Context, target string) {
 
 	// Remove from whitelist
 	for _, user := range whitelist {
-		if user.Pk != target {
+		if user.PublicKey != target {
 			updatedWhitelist = append(updatedWhitelist, user)
 		}
 		if user.InvitedBy == target {
-			queue = append(queue, user.Pk)
+			queue = append(queue, user.PublicKey)
 		}
 	}
 	whitelist = updatedWhitelist
@@ -64,7 +63,7 @@ func deleteFromWhitelistRecursively(ctx context.Context, target string) {
 	for ev := range events {
 		err := db.DeleteEvent(ctx, ev)
 		if err != nil {
-			log.Println("error while deleting event", err)
+			log.Error().Err(err).Msg("failed to delete event")
 		}
 	}
 
@@ -80,7 +79,7 @@ func getProfileInfoFromJson(jsonStr string) (string, string) {
 	var data map[string]interface{}
 	err := json.Unmarshal([]byte(jsonStr), &data)
 	if err != nil {
-		fmt.Println("Error parsing JSON:", err)
+		log.Error().Err(err).Msg("failed to read profile from json")
 		return "", ""
 	}
 

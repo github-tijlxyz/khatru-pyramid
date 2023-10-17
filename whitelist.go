@@ -3,21 +3,19 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"os"
 
 	"github.com/nbd-wtf/go-nostr"
 )
 
 type WhitelistEntry struct {
-	Pk        string `json:"pk"`
+	PublicKey string `json:"pk"`
 	InvitedBy string `json:"invited_by"`
 }
 
 var whitelist []WhitelistEntry
 
 func whitelistRejecter(ctx context.Context, evt *nostr.Event) (reject bool, msg string) {
-
 	// check if user in whitelist
 	if !isPkInWhitelist(evt.PubKey) {
 		return true, "You are not invited to this relay"
@@ -32,7 +30,7 @@ func whitelistRejecter(ctx context.Context, evt *nostr.Event) (reject bool, msg 
 		for _, tag := range pTags {
 			if !isPkInWhitelist(tag.Value()) {
 				if nostr.IsValidPublicKeyHex(tag.Value()) {
-					whitelist = append(whitelist, WhitelistEntry{Pk: tag.Value(), InvitedBy: evt.PubKey})
+					whitelist = append(whitelist, WhitelistEntry{PublicKey: tag.Value(), InvitedBy: evt.PubKey})
 				}
 			}
 		}
@@ -52,13 +50,13 @@ func whitelistRejecter(ctx context.Context, evt *nostr.Event) (reject bool, msg 
 				 2: Cant remove self
 				 3: User should have invited user OR be relay admin
 				*/
-				if user.Pk == tag.Value() && evt.PubKey != tag.Value() && (user.InvitedBy == evt.PubKey || evt.PubKey == relayMaster) {
-					log.Println("deleting user", tag.Value())
+				if user.PublicKey == tag.Value() && evt.PubKey != tag.Value() && (user.InvitedBy == evt.PubKey || evt.PubKey == s.RelayPubkey) {
+					log.Info().Str("user", tag.Value()).Msg("deleting user")
 					deleteFromWhitelistRecursively(ctx, tag.Value())
 				}
 			}
 		}
-		if evt.PubKey == relayMaster {
+		if evt.PubKey == s.RelayPubkey {
 			eTags := evt.Tags.GetAll([]string{"e"})
 			for _, tag := range eTags {
 				filter := nostr.Filter{
@@ -66,11 +64,11 @@ func whitelistRejecter(ctx context.Context, evt *nostr.Event) (reject bool, msg 
 				}
 				events, _ := db.QueryEvents(ctx, filter)
 
-				for ev := range events {
-					log.Println("deleting event", ev.ID)
-					err := db.DeleteEvent(ctx, ev)
+				for evt := range events {
+					log.Info().Str("event", evt.ID).Msg("deleting event")
+					err := db.DeleteEvent(ctx, evt)
 					if err != nil {
-						log.Println("error while deleting event", err)
+						log.Warn().Err(err).Msg("failed to delete event")
 					}
 				}
 			}
@@ -78,7 +76,6 @@ func whitelistRejecter(ctx context.Context, evt *nostr.Event) (reject bool, msg 
 	}
 
 	return false, ""
-
 }
 
 func loadWhitelist() error {
