@@ -8,6 +8,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/nbd-wtf/go-nostr v0.20.0
 	github.com/rs/zerolog v1.31.0
+	github.com/theplant/htmlgo v1.0.3
 )
 
 require (
@@ -52,3 +53,5 @@ require (
 	golang.org/x/sys v0.12.0 // indirect
 	google.golang.org/protobuf v1.23.0 // indirect
 )
+
+replace github.com/fiatjaf/khatru => /home/fiatjaf/comp/khatru

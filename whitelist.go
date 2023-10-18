@@ -17,7 +17,7 @@ var whitelist []WhitelistEntry
 
 func whitelistRejecter(ctx context.Context, evt *nostr.Event) (reject bool, msg string) {
 	// check if user in whitelist
-	if !isPkInWhitelist(evt.PubKey) {
+	if !isPublicKeyInWhitelist(evt.PubKey) {
 		return true, "You are not invited to this relay"
 	}
 
@@ -28,10 +28,8 @@ func whitelistRejecter(ctx context.Context, evt *nostr.Event) (reject bool, msg 
 	if evt.Kind == 20201 {
 		pTags := evt.Tags.GetAll([]string{"p"})
 		for _, tag := range pTags {
-			if !isPkInWhitelist(tag.Value()) {
-				if nostr.IsValidPublicKeyHex(tag.Value()) {
-					whitelist = append(whitelist, WhitelistEntry{PublicKey: tag.Value(), InvitedBy: evt.PubKey})
-				}
+			if nostr.IsValidPublicKeyHex(tag.Value()) && !isPublicKeyInWhitelist(tag.Value()) {
+				whitelist = append(whitelist, WhitelistEntry{PublicKey: tag.Value(), InvitedBy: evt.PubKey})
 			}
 		}
 	}

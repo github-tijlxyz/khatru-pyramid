@@ -3,37 +3,17 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"html/template"
 
 	"github.com/nbd-wtf/go-nostr"
 )
 
-func buildHTMLTree(entries []WhitelistEntry, invitedBy string) template.HTML {
-	html := "<ul>"
-
-	for _, entry := range entries {
-		if entry.InvitedBy == invitedBy {
-			user := getUserInfo(context.TODO(), entry.PublicKey)
-			html += fmt.Sprintf(`
-			<li>
-			<a class="user" href="nostr:%s">%s</a>
-			<a data-actionarg='[["p", "%v"]]' class="rembtn removefromrelay">x</a>
-			%s
-			</li>`, template.HTMLEscapeString(user.Npub),
-				template.HTMLEscapeString(user.Name),
-				entry.PublicKey,
-				buildHTMLTree(entries, entry.PublicKey))
-		}
+func isPublicKeyInWhitelist(pubkey string) bool {
+	if pubkey == s.RelayPubkey {
+		return true
 	}
 
-	html += "</ul>"
-	return template.HTML(html)
-}
-
-func isPkInWhitelist(targetPk string) bool {
 	for i := 0; i < len(whitelist); i++ {
-		if whitelist[i].PublicKey == targetPk {
+		if whitelist[i].PublicKey == pubkey {
 			return true
 		}
 	}
