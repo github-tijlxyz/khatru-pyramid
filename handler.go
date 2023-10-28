@@ -19,6 +19,26 @@ func inviteTreeHandler(w http.ResponseWriter, r *http.Request) {
 	htmlgo.Fprint(w, baseHTML(content), r.Context())
 }
 
+func addToWhitelistHandler(w http.ResponseWriter, r *http.Request) {
+	pubkey := r.PostFormValue("pubkey")
+	if err := addToWhitelist(r.Context(), pubkey, s.RelayPubkey); err != nil {
+		http.Error(w, "failed to add to whitelist: "+err.Error(), 500)
+		return
+	}
+	content := buildInviteTree(r.Context(), s.RelayPubkey)
+	htmlgo.Fprint(w, content, r.Context())
+}
+
+func removeFromWhitelistHandler(w http.ResponseWriter, r *http.Request) {
+	pubkey := r.PostFormValue("pubkey")
+	if err := removeFromWhitelist(r.Context(), pubkey); err != nil {
+		http.Error(w, "failed to remove from whitelist: "+err.Error(), 500)
+		return
+	}
+	content := buildInviteTree(r.Context(), s.RelayPubkey)
+	htmlgo.Fprint(w, content, r.Context())
+}
+
 func reportsViewerHandler(w http.ResponseWriter, r *http.Request) {
 	// var formattedReportsData template.HTML = ""
 

@@ -6,11 +6,12 @@ import (
 	"os"
 
 	"github.com/nbd-wtf/go-nostr"
+	"golang.org/x/exp/slices"
 )
 
 type WhitelistEntry struct {
-	PublicKey string `json:"pk"`
 	InvitedBy string `json:"invited_by"`
+	PublicKey string `json:"pk"`
 }
 
 var whitelist []WhitelistEntry
@@ -26,12 +27,6 @@ func whitelistRejecter(ctx context.Context, evt *nostr.Event) (reject bool, msg 
 	 invited/whitelisted user invites new user
 	*/
 	if evt.Kind == 20201 {
-		pTags := evt.Tags.GetAll([]string{"p"})
-		for _, tag := range pTags {
-			if nostr.IsValidPublicKeyHex(tag.Value()) && !isPublicKeyInWhitelist(tag.Value()) {
-				whitelist = append(whitelist, WhitelistEntry{PublicKey: tag.Value(), InvitedBy: evt.PubKey})
-			}
-		}
 	}
 
 	/*
@@ -74,6 +69,23 @@ func whitelistRejecter(ctx context.Context, evt *nostr.Event) (reject bool, msg 
 	}
 
 	return false, ""
+}
+
+func addToWhitelist(ctx context.Context, pubkey string, invitedBy string) error {
+	if nostr.IsValidPublicKeyHex(pubkey) && !isPublicKeyInWhitelist(pubkey) {
+		whitelist = append(whitelist, WhitelistEntry{PublicKey: pubkey, InvitedBy: invitedBy})
+	}
+	return saveWhitelist()
+}
+
+func removeFromWhitelist(ctx context.Context, pubkey string) error {
+	idx := slices.IndexFunc(whitelist, func(we WhitelistEntry) bool { return we.PublicKey == pubkey })
+	if idx == -1 {
+		return nil
+	}
+
+	whitelist = append(whitelist[0:idx], whitelist[idx+1:]...)
+	return saveWhitelist()
 }
 
 func loadWhitelist() error {

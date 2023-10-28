@@ -3,14 +3,9 @@ package main
 import (
 	"net/http"
 	"os"
-	"os/signal"
-	"sync"
-	"syscall"
-	"time"
 
 	"github.com/fiatjaf/khatru"
 	"github.com/fiatjaf/khatru/plugins/storage/badgern"
-	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/rs/zerolog"
 )
@@ -36,25 +31,6 @@ func main() {
 		return
 	}
 
-	// save whitelist on shutdown
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		handleSignals()
-	}()
-
-	// backup whitelist every hour
-	go func() {
-		for {
-			time.Sleep(time.Hour)
-			saveWhitelist()
-		}
-	}()
-
-	// init env config
-	godotenv.Load(".env")
-
 	// init relay
 	relay := khatru.NewRelay()
 
@@ -78,11 +54,11 @@ func main() {
 	relay.QueryEvents = append(relay.QueryEvents, db.QueryEvents)
 	relay.CountEvents = append(relay.CountEvents, db.CountEvents)
 	relay.DeleteEvent = append(relay.DeleteEvent, db.DeleteEvent)
-
 	relay.RejectEvent = append(relay.RejectEvent, whitelistRejecter)
 
-	// ui
 	relay.Router().HandleFunc("/reports", reportsViewerHandler)
+	relay.Router().HandleFunc("/add-to-whitelist", addToWhitelistHandler)
+	relay.Router().HandleFunc("/remove-from-whitelist", removeFromWhitelistHandler)
 	relay.Router().HandleFunc("/users", inviteTreeHandler)
 	relay.Router().HandleFunc("/", homePageHandler)
 
@@ -90,13 +66,4 @@ func main() {
 	if err := http.ListenAndServe(":"+s.Port, relay); err != nil {
 		log.Fatal().Err(err).Msg("failed to serve")
 	}
-}
-
-// save whitelist on shutdown
-func handleSignals() {
-	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
-	<-sigCh
-	saveWhitelist()
-	os.Exit(0)
 }
