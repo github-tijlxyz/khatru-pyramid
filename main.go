@@ -22,9 +22,10 @@ type Settings struct {
 }
 
 var (
-	db  badgern.BadgerBackend
-	s   Settings
-	log = zerolog.New(os.Stderr).Output(zerolog.ConsoleWriter{Out: os.Stdout}).With().Timestamp().Logger()
+	db        badgern.BadgerBackend
+	s         Settings
+	log       = zerolog.New(os.Stderr).Output(zerolog.ConsoleWriter{Out: os.Stdout}).With().Timestamp().Logger()
+	whitelist = make(Whitelist)
 )
 
 func main() {
@@ -44,20 +45,21 @@ func main() {
 
 	// load whitelist storage
 	if err := loadWhitelist(); err != nil {
-		panic(err)
+		log.Fatal().Err(err).Msg("failed to load whitelist")
+		return
 	}
 
 	// load db
 	db = badgern.BadgerBackend{Path: "./khatru-badgern-db"}
 	if err := db.Init(); err != nil {
-		panic(err)
+		log.Fatal().Err(err).Msg("failed to initialize database")
+		return
 	}
 
 	relay.StoreEvent = append(relay.StoreEvent, db.SaveEvent)
 	relay.QueryEvents = append(relay.QueryEvents, db.QueryEvents)
 	relay.CountEvents = append(relay.CountEvents, db.CountEvents)
 	relay.DeleteEvent = append(relay.DeleteEvent, db.DeleteEvent)
-	relay.RejectEvent = append(relay.RejectEvent, whitelistRejecter)
 
 	relay.Router().HandleFunc("/reports", reportsViewerHandler)
 	relay.Router().HandleFunc("/add-to-whitelist", addToWhitelistHandler)

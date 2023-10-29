@@ -78,31 +78,38 @@ func inviteTreePageHTML(ctx context.Context, params InviteTreePageParams) HTMLCo
 		Input("pubkey").Type("text").Placeholder("npub1...").Class("w-96 rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"),
 		Button("invite").Class(buttonClass+" p-2 bg-white hover:bg-gray-50"),
 		Div(
-			buildInviteTree(ctx, s.RelayPubkey, params.LoggedUser),
+			buildInviteTree(ctx, "", params.LoggedUser),
 		).Id("tree").Class("mt-3"),
-	).Attr("hx-post", "/add-to-whitelist", "hx-trigger", "submit", "hx-target", "#tree")
+	).Attr(
+		"hx-post", "/add-to-whitelist",
+		"hx-trigger", "submit",
+		"hx-target", "#tree",
+		"_", "on htmx:afterRequest(elt, successful) if successful and elt is I call I.reset()",
+	)
 }
 
-func buildInviteTree(ctx context.Context, invitedBy string, loggedUser string) HTMLComponent {
+func buildInviteTree(ctx context.Context, inviter string, loggedUser string) HTMLComponent {
 	children := make([]HTMLComponent, 0, len(whitelist))
-	for _, entry := range whitelist {
-		if entry.InvitedBy == invitedBy {
-			user := getUserInfo(ctx, entry.PublicKey)
+	for pubkey, invitedBy := range whitelist {
+		if invitedBy == inviter {
+			user := getUserInfo(ctx, pubkey)
 			button := Span("")
-			if invitedBy == loggedUser {
+			if isAncestorOf(loggedUser, pubkey) && loggedUser != pubkey {
 				button = Button("remove").
 					Class(buttonClass+" px-2 bg-red-100 hover:bg-red-300").
-					Attr("hx-post", "/remove-from-whitelist",
+					Attr(
+						"hx-post", "/remove-from-whitelist",
 						"hx-trigger", "click",
 						"hx-target", "#tree",
-						"hx-vals", `{"pubkey": "`+entry.PublicKey+`"}`)
+						"hx-vals", `{"pubkey": "`+pubkey+`"}`,
+					)
 			}
 
 			children = append(children,
 				Li(
 					A().Href("nostr:"+user.Npub).Text(user.Name).Class("font-mono py-1"),
 					button,
-					buildInviteTree(ctx, entry.PublicKey, loggedUser),
+					buildInviteTree(ctx, pubkey, loggedUser),
 				).Class("ml-4"),
 			)
 		}

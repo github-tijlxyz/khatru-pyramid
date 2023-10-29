@@ -1,111 +1,79 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
 
 	"github.com/nbd-wtf/go-nostr"
-	"golang.org/x/exp/slices"
 )
 
-type WhitelistEntry struct {
-	InvitedBy string `json:"invited_by"`
-	PublicKey string `json:"pk"`
-}
+const WHITELIST_FILE = "users.json"
 
-var whitelist []WhitelistEntry
+type Whitelist map[string]string // { [user_pubkey]: [invited_by] }
 
-func whitelistRejecter(ctx context.Context, evt *nostr.Event) (reject bool, msg string) {
-	// check if user in whitelist
-	if !isPublicKeyInWhitelist(evt.PubKey) {
-		return true, "You are not invited to this relay"
-	}
-
-	/*
-	 kind 20201
-	 invited/whitelisted user invites new user
-	*/
-	if evt.Kind == 20201 {
-	}
-
-	/*
-	 kind 20202
-	 p tag = user removes user they invited OR admin removes user
-	 e tag = admin removes event
-	*/
-	if evt.Kind == 20202 {
-		pTags := evt.Tags.GetAll([]string{"p"})
-		for _, tag := range pTags {
-			for _, user := range whitelist {
-				/*
-				 1: User in whitelist
-				 2: Cant remove self
-				 3: User should have invited user OR be relay admin
-				*/
-				if user.PublicKey == tag.Value() && evt.PubKey != tag.Value() && (user.InvitedBy == evt.PubKey || evt.PubKey == s.RelayPubkey) {
-					log.Info().Str("user", tag.Value()).Msg("deleting user")
-					deleteFromWhitelistRecursively(ctx, tag.Value())
-				}
-			}
-		}
-		if evt.PubKey == s.RelayPubkey {
-			eTags := evt.Tags.GetAll([]string{"e"})
-			for _, tag := range eTags {
-				filter := nostr.Filter{
-					IDs: []string{tag.Value()},
-				}
-				events, _ := db.QueryEvents(ctx, filter)
-
-				for evt := range events {
-					log.Info().Str("event", evt.ID).Msg("deleting event")
-					err := db.DeleteEvent(ctx, evt)
-					if err != nil {
-						log.Warn().Err(err).Msg("failed to delete event")
-					}
-				}
-			}
-		}
-	}
-
-	return false, ""
-}
-
-func addToWhitelist(ctx context.Context, pubkey string, inviter string) error {
+func addToWhitelist(pubkey string, inviter string) error {
 	if nostr.IsValidPublicKeyHex(pubkey) && isPublicKeyInWhitelist(inviter) && !isPublicKeyInWhitelist(pubkey) {
-		whitelist = append(whitelist, WhitelistEntry{PublicKey: pubkey, InvitedBy: inviter})
+		whitelist[pubkey] = inviter
 	}
 	return saveWhitelist()
 }
 
-func removeFromWhitelist(ctx context.Context, pubkey string, deleter string) error {
-	idx := slices.IndexFunc(whitelist, func(we WhitelistEntry) bool { return we.PublicKey == pubkey })
-	if idx == -1 {
-		return nil
+func isPublicKeyInWhitelist(pubkey string) bool {
+	_, ok := whitelist[pubkey]
+	return ok
+}
+
+func isAncestorOf(pubkey string, target string) bool {
+	ancestor := target // we must find out if we are an ancestor of the target, but we can delete ourselves
+	for {
+		if ancestor == pubkey {
+			break
+		}
+
+		parent, ok := whitelist[ancestor]
+		if !ok {
+			// parent is not in whitelist, this means this is a top-level user and can
+			// only be deleted by manually editing the users.json file
+			return false
+		}
+
+		ancestor = parent
 	}
-	if whitelist[idx].InvitedBy != deleter {
-		return fmt.Errorf("can't remove a user you haven't invited")
+	return true
+}
+
+func removeFromWhitelist(target string, deleter string) error {
+	// check if this user is a descendant of the user who issued the delete command
+	if !isAncestorOf(deleter, target) {
+		return fmt.Errorf("insufficient permissions to delete this")
 	}
 
-	whitelist = append(whitelist[0:idx], whitelist[idx+1:]...)
+	// if we got here that means we have permission to delete the target
+	delete(whitelist, target)
+
+	// delete all people who were invited by the target
+	removeDescendantsFromWhitelist(target)
+
 	return saveWhitelist()
+}
+
+func removeDescendantsFromWhitelist(ancestor string) {
+	for pubkey, inviter := range whitelist {
+		if inviter == ancestor {
+			delete(whitelist, pubkey)
+			removeDescendantsFromWhitelist(pubkey)
+		}
+	}
 }
 
 func loadWhitelist() error {
-	if _, err := os.Stat("whitelist.json"); os.IsNotExist(err) {
-		whitelist = []WhitelistEntry{}
-		return nil
-	} else if err != nil {
-		return err
-	}
-
-	fileContent, err := os.ReadFile("whitelist.json")
+	b, err := os.ReadFile(WHITELIST_FILE)
 	if err != nil {
 		return err
 	}
 
-	if err := json.Unmarshal(fileContent, &whitelist); err != nil {
+	if err := json.Unmarshal(b, &whitelist); err != nil {
 		return err
 	}
 
@@ -118,7 +86,7 @@ func saveWhitelist() error {
 		return err
 	}
 
-	if err := os.WriteFile("whitelist.json", jsonBytes, 0644); err != nil {
+	if err := os.WriteFile(WHITELIST_FILE, jsonBytes, 0644); err != nil {
 		return err
 	}
 

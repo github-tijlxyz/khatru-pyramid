@@ -25,22 +25,22 @@ func addToWhitelistHandler(w http.ResponseWriter, r *http.Request) {
 		pubkey = value.(string)
 	}
 
-	if err := addToWhitelist(r.Context(), pubkey, loggedUser); err != nil {
+	if err := addToWhitelist(pubkey, loggedUser); err != nil {
 		http.Error(w, "failed to add to whitelist: "+err.Error(), 500)
 		return
 	}
-	content := buildInviteTree(r.Context(), s.RelayPubkey, loggedUser)
+	content := buildInviteTree(r.Context(), "", loggedUser)
 	htmlgo.Fprint(w, content, r.Context())
 }
 
 func removeFromWhitelistHandler(w http.ResponseWriter, r *http.Request) {
 	loggedUser := getLoggedUser(r)
 	pubkey := r.PostFormValue("pubkey")
-	if err := removeFromWhitelist(r.Context(), pubkey, loggedUser); err != nil {
+	if err := removeFromWhitelist(pubkey, loggedUser); err != nil {
 		http.Error(w, "failed to remove from whitelist: "+err.Error(), 500)
 		return
 	}
-	content := buildInviteTree(r.Context(), s.RelayPubkey, loggedUser)
+	content := buildInviteTree(r.Context(), "", loggedUser)
 	htmlgo.Fprint(w, content, r.Context())
 }
 
