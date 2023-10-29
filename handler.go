@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"embed"
 	"net/http"
 	"strings"
 
@@ -10,9 +9,6 @@ import (
 )
 
 // embed ui files
-
-//go:embed ui/dist/*
-var dist embed.FS
 
 func inviteTreeHandler(w http.ResponseWriter, r *http.Request) {
 	content := inviteTreePageHTML(r.Context(), InviteTreePageParams{})
@@ -155,28 +151,4 @@ func homePageHandler(w http.ResponseWriter, r *http.Request) {
 		RelayOwnerInfo: getUserInfo(context.Background(), s.RelayPubkey),
 	})
 	htmlgo.Fprint(w, baseHTML(content), r.Context())
-}
-
-func staticHandler(prefix string, w http.ResponseWriter, r *http.Request) {
-	path := prefix + r.URL.Path
-
-	data, err := dist.ReadFile(path)
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
-
-	contentType := http.DetectContentType(data)
-	if strings.HasSuffix(r.URL.Path, ".js") {
-		contentType = "application/javascript"
-	} else if strings.HasSuffix(r.URL.Path, ".css") {
-		contentType = "text/css"
-	}
-
-	w.Header().Set("Content-Type", contentType)
-
-	if _, err := w.Write(data); err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
 }
