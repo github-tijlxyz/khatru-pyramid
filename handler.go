@@ -3,35 +3,44 @@ package main
 import (
 	"context"
 	"net/http"
-	"strings"
 
+	"github.com/nbd-wtf/go-nostr/nip19"
 	"github.com/theplant/htmlgo"
 )
 
 // embed ui files
 
 func inviteTreeHandler(w http.ResponseWriter, r *http.Request) {
-	content := inviteTreePageHTML(r.Context(), InviteTreePageParams{})
+	content := inviteTreePageHTML(r.Context(), InviteTreePageParams{
+		LoggedUser: getLoggedUser(r),
+	})
 	htmlgo.Fprint(w, baseHTML(content), r.Context())
 }
 
 func addToWhitelistHandler(w http.ResponseWriter, r *http.Request) {
+	loggedUser := getLoggedUser(r)
+
 	pubkey := r.PostFormValue("pubkey")
-	if err := addToWhitelist(r.Context(), pubkey, s.RelayPubkey); err != nil {
+	if pfx, value, err := nip19.Decode(pubkey); err == nil && pfx == "npub" {
+		pubkey = value.(string)
+	}
+
+	if err := addToWhitelist(r.Context(), pubkey, loggedUser); err != nil {
 		http.Error(w, "failed to add to whitelist: "+err.Error(), 500)
 		return
 	}
-	content := buildInviteTree(r.Context(), s.RelayPubkey)
+	content := buildInviteTree(r.Context(), s.RelayPubkey, loggedUser)
 	htmlgo.Fprint(w, content, r.Context())
 }
 
 func removeFromWhitelistHandler(w http.ResponseWriter, r *http.Request) {
+	loggedUser := getLoggedUser(r)
 	pubkey := r.PostFormValue("pubkey")
-	if err := removeFromWhitelist(r.Context(), pubkey); err != nil {
+	if err := removeFromWhitelist(r.Context(), pubkey, loggedUser); err != nil {
 		http.Error(w, "failed to remove from whitelist: "+err.Error(), 500)
 		return
 	}
-	content := buildInviteTree(r.Context(), s.RelayPubkey)
+	content := buildInviteTree(r.Context(), s.RelayPubkey, loggedUser)
 	htmlgo.Fprint(w, content, r.Context())
 }
 

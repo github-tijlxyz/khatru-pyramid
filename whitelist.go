@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/nbd-wtf/go-nostr"
@@ -71,17 +72,20 @@ func whitelistRejecter(ctx context.Context, evt *nostr.Event) (reject bool, msg 
 	return false, ""
 }
 
-func addToWhitelist(ctx context.Context, pubkey string, invitedBy string) error {
-	if nostr.IsValidPublicKeyHex(pubkey) && !isPublicKeyInWhitelist(pubkey) {
-		whitelist = append(whitelist, WhitelistEntry{PublicKey: pubkey, InvitedBy: invitedBy})
+func addToWhitelist(ctx context.Context, pubkey string, inviter string) error {
+	if nostr.IsValidPublicKeyHex(pubkey) && isPublicKeyInWhitelist(inviter) && !isPublicKeyInWhitelist(pubkey) {
+		whitelist = append(whitelist, WhitelistEntry{PublicKey: pubkey, InvitedBy: inviter})
 	}
 	return saveWhitelist()
 }
 
-func removeFromWhitelist(ctx context.Context, pubkey string) error {
+func removeFromWhitelist(ctx context.Context, pubkey string, deleter string) error {
 	idx := slices.IndexFunc(whitelist, func(we WhitelistEntry) bool { return we.PublicKey == pubkey })
 	if idx == -1 {
 		return nil
+	}
+	if whitelist[idx].InvitedBy != deleter {
+		return fmt.Errorf("can't remove a user you haven't invited")
 	}
 
 	whitelist = append(whitelist[0:idx], whitelist[idx+1:]...)

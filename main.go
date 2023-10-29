@@ -1,12 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
+	"net/url"
 	"os"
 
 	"github.com/fiatjaf/khatru"
 	"github.com/fiatjaf/khatru/plugins/storage/badgern"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/nbd-wtf/go-nostr"
 	"github.com/rs/zerolog"
 )
 
@@ -66,4 +69,16 @@ func main() {
 	if err := http.ListenAndServe(":"+s.Port, relay); err != nil {
 		log.Fatal().Err(err).Msg("failed to serve")
 	}
+}
+
+func getLoggedUser(r *http.Request) string {
+	if cookie, _ := r.Cookie("nip98"); cookie != nil {
+		if evtj, err := url.QueryUnescape(cookie.Value); err == nil {
+			var evt nostr.Event
+			if err := json.Unmarshal([]byte(evtj), &evt); err == nil {
+				return evt.PubKey
+			}
+		}
+	}
+	return ""
 }
