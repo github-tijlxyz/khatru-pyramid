@@ -56,7 +56,11 @@ func main() {
 	relay.QueryEvents = append(relay.QueryEvents, db.QueryEvents)
 	relay.CountEvents = append(relay.CountEvents, db.CountEvents)
 	relay.DeleteEvent = append(relay.DeleteEvent, db.DeleteEvent)
-	relay.RejectEvent = append(relay.RejectEvent, rejectEventsFromUsersNotInWhitelist)
+	relay.RejectEvent = append(relay.RejectEvent,
+		rejectEventsFromUsersNotInWhitelist,
+		restrictToKinds,
+		validateAndFilterReports,
+	)
 
 	// load users registry
 	if err := loadWhitelist(); err != nil {

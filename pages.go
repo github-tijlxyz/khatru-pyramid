@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 
+	"github.com/nbd-wtf/go-nostr"
 	sdk "github.com/nbd-wtf/nostr-sdk"
 	. "github.com/theplant/htmlgo"
 )
@@ -62,7 +63,7 @@ func homePageHTML(ctx context.Context, params HomePageParams) HTMLComponent {
 		contact,
 		Div(
 			Text("relay master: "),
-			userNameComponent(ctx, params.relayOwnerInfo),
+			userNameComponent(params.relayOwnerInfo),
 		),
 		Br(),
 		Div(
@@ -100,5 +101,73 @@ func inviteTreePageHTML(ctx context.Context, params InviteTreePageParams) HTMLCo
 		Div(
 			inviteTreeComponent(ctx, "", params.loggedUser),
 		).Id("tree").Class("mt-3"),
+	)
+}
+
+type ReportsPageParams struct {
+	reports    chan *nostr.Event
+	loggedUser string
+}
+
+func reportsPageHTML(ctx context.Context, params ReportsPageParams) HTMLComponent {
+	items := make([]HTMLComponent, 0, 52)
+	for report := range params.reports {
+		var primaryType string
+		var secondaryType string
+		var relatedContent HTMLComponent
+
+		if e := report.Tags.GetFirst([]string{"e", ""}); e != nil {
+			// event report
+			res, _ := sys.StoreRelay().QuerySync(ctx, nostr.Filter{IDs: []string{(*e)[1]}})
+			if len(res) == 0 {
+				sys.Store.DeleteEvent(ctx, report)
+				continue
+			}
+
+			if len(*e) >= 3 {
+				primaryType = (*e)[2]
+			}
+
+			relatedEvent := res[0]
+			relatedContent = Div(
+				Text("event reported: "),
+				Div().Text(relatedEvent.String()).Class("text-mono"),
+			)
+		} else if p := report.Tags.GetFirst([]string{"p", ""}); p != nil {
+			// pubkey report
+			if !isPublicKeyInWhitelist((*p)[1]) {
+				sys.Store.DeleteEvent(ctx, report)
+				continue
+			}
+
+			if len(*p) >= 3 {
+				primaryType = (*p)[2]
+			}
+
+			relatedProfile := fetchAndStoreProfile(ctx, (*p)[1])
+			relatedContent = Div(
+				Text("profile reported: "),
+				userNameComponent(relatedProfile),
+			)
+		} else {
+			continue
+		}
+
+		reporter := sys.FetchProfileMetadata(ctx, report.PubKey)
+		report := Div(
+			Div(Span(primaryType).Class("font-semibold"), Text(" report")).Class("font-lg"),
+			Div().Text(secondaryType),
+			Div(Text("by "), userNameComponent(reporter)),
+			Div().Text(report.Content).Class("p-3"),
+			relatedContent,
+		)
+
+		items = append(items, report)
+	}
+	return baseHTML(
+		Div(
+			H1("reports received").Class("text-xl p-4"),
+			Div(items...),
+		),
 	)
 }

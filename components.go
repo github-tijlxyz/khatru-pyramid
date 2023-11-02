@@ -32,13 +32,13 @@ func userRowComponent(ctx context.Context, profile sdk.ProfileMetadata, loggedUs
 	}
 
 	return Li(
-		userNameComponent(ctx, profile),
+		userNameComponent(profile),
 		button,
 		inviteTreeComponent(ctx, profile.PubKey, loggedUser),
 	).Class("ml-6")
 }
 
-func userNameComponent(ctx context.Context, profile sdk.ProfileMetadata) HTMLComponent {
+func userNameComponent(profile sdk.ProfileMetadata) HTMLComponent {
 	return A().Href("nostr:" + profile.Npub()).Children(
 		Span(profile.ShortName()).Attr(
 			"npub", profile.Npub(),
