@@ -32,7 +32,7 @@ func baseHTML(inside HTMLComponent) HTMLComponent {
 				A().Text("reports").Href("/reports").Class(navItemClass).Attr("hx-boost", "true", "hx-target", "main", "hx-select", "main"),
 				A().Text("").Href("#").Class(navItemClass).
 					Attr("_", `
-on click if my innerText is equal to "login" get window.nostr.signEvent({created_at: Math.round(Date.now()/1000), kind: 27235, tags: [['domain', "`+s.Domain+`"]], content: ''}) then get JSON.stringify(it) then set cookies['nip98'] to it otherwise call cookies.clear('nip98') end then trigger load on me
+on click if my innerText is equal to "login" get window.nostr.signEvent({created_at: Math.round(Date.now()/1000), kind: 27235, tags: [['domain', "`+s.Domain+`"]], content: ''}) then get JSON.stringify(it) then set cookies['nip98'] to it otherwise call cookies.clear('nip98') end then call location.reload()
 
 on load get cookies['nip98'] then if it is undefined set my innerText to "login" otherwise set my innerText to "logout"`),
 			).Class("flex flex-1 items-center justify-center"),
