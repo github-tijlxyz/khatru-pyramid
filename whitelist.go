@@ -13,9 +13,19 @@ const WHITELIST_FILE = "users.json"
 type Whitelist map[string]string // { [user_pubkey]: [invited_by] }
 
 func addToWhitelist(pubkey string, inviter string) error {
-	if nostr.IsValidPublicKeyHex(pubkey) && isPublicKeyInWhitelist(inviter) && !isPublicKeyInWhitelist(pubkey) {
-		whitelist[pubkey] = inviter
+	if !isPublicKeyInWhitelist(inviter) {
+		return fmt.Errorf("pubkey %s doesn't have permission to invite", inviter)
 	}
+
+	if !nostr.IsValidPublicKeyHex(pubkey) {
+		return fmt.Errorf("pubkey invalid: %s", pubkey)
+	}
+
+	if isPublicKeyInWhitelist(pubkey) {
+		return fmt.Errorf("pubkey already in whitelist: %s", pubkey)
+	}
+
+	whitelist[pubkey] = inviter
 	return saveWhitelist()
 }
 

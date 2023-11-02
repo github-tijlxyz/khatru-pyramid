@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/nbd-wtf/go-nostr/nip19"
@@ -10,16 +9,9 @@ import (
 
 func inviteTreeHandler(w http.ResponseWriter, r *http.Request) {
 	content := inviteTreePageHTML(r.Context(), InviteTreePageParams{
-		LoggedUser: getLoggedUser(r),
+		loggedUser: getLoggedUser(r),
 	})
 	htmlgo.Fprint(w, baseHTML(content), r.Context())
-}
-
-func getUserRowHandler(w http.ResponseWriter, r *http.Request) {
-	pubkey := r.PostFormValue("pubkey")
-	profile := fetchAndStoreProfile(r.Context(), pubkey)
-	content := userRowComponent(r.Context(), profile, getLoggedUser(r))
-	htmlgo.Fprint(w, content, r.Context())
 }
 
 func addToWhitelistHandler(w http.ResponseWriter, r *http.Request) {
@@ -34,6 +26,7 @@ func addToWhitelistHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to add to whitelist: "+err.Error(), 500)
 		return
 	}
+
 	content := inviteTreeComponent(r.Context(), "", loggedUser)
 	htmlgo.Fprint(w, content, r.Context())
 }
@@ -162,7 +155,7 @@ func reportsViewerHandler(w http.ResponseWriter, r *http.Request) {
 
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	content := homePageHTML(r.Context(), HomePageParams{
-		RelayOwnerInfo: fetchAndStoreProfile(context.Background(), s.RelayPubkey),
+		relayOwnerInfo: fetchAndStoreProfile(r.Context(), s.RelayPubkey),
 	})
 	htmlgo.Fprint(w, baseHTML(content), r.Context())
 }

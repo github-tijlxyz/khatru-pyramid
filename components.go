@@ -32,16 +32,20 @@ func userRowComponent(ctx context.Context, profile sdk.ProfileMetadata, loggedUs
 	}
 
 	return Li(
-		A().Href("nostr:"+profile.Npub()).Children(
-			Span(profile.ShortName()).Attr(
-				"npub", profile.Npub(),
-				"name", profile.ShortName(),
-				"_", `
-on mouseenter set my innerText to @npub then hide the next <button />
-on mouseleave set my innerText to @name then show the next <button />`,
-			),
-		).Class("font-mono py-1"),
+		userNameComponent(ctx, profile),
 		button,
 		inviteTreeComponent(ctx, profile.PubKey, loggedUser),
 	).Class("ml-6")
+}
+
+func userNameComponent(ctx context.Context, profile sdk.ProfileMetadata) HTMLComponent {
+	return A().Href("nostr:" + profile.Npub()).Children(
+		Span(profile.ShortName()).Attr(
+			"npub", profile.Npub(),
+			"name", profile.ShortName(),
+			"_", `
+on mouseenter set my innerText to @npub then hide the next <button />
+on mouseleave set my innerText to @name then show the next <button />`,
+		),
+	).Class("font-mono py-1")
 }

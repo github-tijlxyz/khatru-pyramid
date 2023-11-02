@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/fiatjaf/eventstore/badgern"
+	"github.com/fiatjaf/eventstore/badger"
 	"github.com/fiatjaf/khatru"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/nbd-wtf/go-nostr"
@@ -25,7 +25,7 @@ type Settings struct {
 
 var (
 	s         Settings
-	db        = badgern.BadgerBackend{}
+	db        = badger.BadgerBackend{}
 	log       = zerolog.New(os.Stderr).Output(zerolog.ConsoleWriter{Out: os.Stdout}).With().Timestamp().Logger()
 	whitelist = make(Whitelist)
 	relay     = khatru.NewRelay()
@@ -52,18 +52,19 @@ func main() {
 	relay.Description = s.RelayDescription
 	relay.Contact = s.RelayContact
 
-	// load whitelist storage
+	relay.StoreEvent = append(relay.StoreEvent, db.SaveEvent)
+	relay.QueryEvents = append(relay.QueryEvents, db.QueryEvents)
+	relay.CountEvents = append(relay.CountEvents, db.CountEvents)
+	relay.DeleteEvent = append(relay.DeleteEvent, db.DeleteEvent)
+	relay.RejectEvent = append(relay.RejectEvent, rejectEventsFromUsersNotInWhitelist)
+
+	// load users registry
 	if err := loadWhitelist(); err != nil {
 		log.Fatal().Err(err).Msg("failed to load whitelist")
 		return
 	}
 
-	relay.StoreEvent = append(relay.StoreEvent, db.SaveEvent)
-	relay.QueryEvents = append(relay.QueryEvents, db.QueryEvents)
-	relay.CountEvents = append(relay.CountEvents, db.CountEvents)
-	relay.DeleteEvent = append(relay.DeleteEvent, db.DeleteEvent)
-
-	relay.Router().HandleFunc("/get-user-row", getUserRowHandler)
+	// http routes
 	relay.Router().HandleFunc("/add-to-whitelist", addToWhitelistHandler)
 	relay.Router().HandleFunc("/remove-from-whitelist", removeFromWhitelistHandler)
 	relay.Router().HandleFunc("/reports", reportsViewerHandler)
