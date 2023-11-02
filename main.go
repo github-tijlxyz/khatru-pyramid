@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"os"
 
+	"github.com/fiatjaf/eventstore/badgern"
 	"github.com/fiatjaf/khatru"
-	"github.com/fiatjaf/khatru/plugins/storage/badgern"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/rs/zerolog"
@@ -15,17 +15,20 @@ import (
 
 type Settings struct {
 	Port             string `envconfig:"PORT" default:"3334"`
+	Domain           string `envconfig:"DOMAIN" required:"true"`
 	RelayName        string `envconfig:"RELAY_NAME" required:"true"`
 	RelayPubkey      string `envconfig:"RELAY_PUBKEY" required:"true"`
 	RelayDescription string `envconfig:"RELAY_DESCRIPTION"`
 	RelayContact     string `envconfig:"RELAY_CONTACT"`
+	DatabasePath     string `envconfig:"DATABASE_PATH" default:"./db"`
 }
 
 var (
-	db        badgern.BadgerBackend
 	s         Settings
+	db        = badgern.BadgerBackend{}
 	log       = zerolog.New(os.Stderr).Output(zerolog.ConsoleWriter{Out: os.Stdout}).With().Timestamp().Logger()
 	whitelist = make(Whitelist)
+	relay     = khatru.NewRelay()
 )
 
 func main() {
@@ -35,9 +38,15 @@ func main() {
 		return
 	}
 
-	// init relay
-	relay := khatru.NewRelay()
+	// load db
+	db.Path = s.DatabasePath
+	if err := db.Init(); err != nil {
+		log.Fatal().Err(err).Msg("failed to initialize database")
+		return
+	}
+	log.Debug().Str("path", db.Path).Msg("initialized database")
 
+	// init relay
 	relay.Name = s.RelayName
 	relay.PubKey = s.RelayPubkey
 	relay.Description = s.RelayDescription
@@ -49,21 +58,15 @@ func main() {
 		return
 	}
 
-	// load db
-	db = badgern.BadgerBackend{Path: "./khatru-badgern-db"}
-	if err := db.Init(); err != nil {
-		log.Fatal().Err(err).Msg("failed to initialize database")
-		return
-	}
-
 	relay.StoreEvent = append(relay.StoreEvent, db.SaveEvent)
 	relay.QueryEvents = append(relay.QueryEvents, db.QueryEvents)
 	relay.CountEvents = append(relay.CountEvents, db.CountEvents)
 	relay.DeleteEvent = append(relay.DeleteEvent, db.DeleteEvent)
 
-	relay.Router().HandleFunc("/reports", reportsViewerHandler)
+	relay.Router().HandleFunc("/get-user-row", getUserRowHandler)
 	relay.Router().HandleFunc("/add-to-whitelist", addToWhitelistHandler)
 	relay.Router().HandleFunc("/remove-from-whitelist", removeFromWhitelistHandler)
+	relay.Router().HandleFunc("/reports", reportsViewerHandler)
 	relay.Router().HandleFunc("/users", inviteTreeHandler)
 	relay.Router().HandleFunc("/", homePageHandler)
 
@@ -78,7 +81,11 @@ func getLoggedUser(r *http.Request) string {
 		if evtj, err := url.QueryUnescape(cookie.Value); err == nil {
 			var evt nostr.Event
 			if err := json.Unmarshal([]byte(evtj), &evt); err == nil {
-				return evt.PubKey
+				if tag := evt.Tags.GetFirst([]string{"domain", ""}); tag != nil && (*tag)[1] == s.Domain {
+					if ok, _ := evt.CheckSignature(); ok {
+						return evt.PubKey
+					}
+				}
 			}
 		}
 	}

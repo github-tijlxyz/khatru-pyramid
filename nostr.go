@@ -2,48 +2,29 @@ package main
 
 import (
 	"context"
-	"time"
 
 	"github.com/nbd-wtf/go-nostr"
-	"github.com/nbd-wtf/go-nostr/nip19"
+	sdk "github.com/nbd-wtf/nostr-sdk"
+	cache_memory "github.com/nbd-wtf/nostr-sdk/cache/memory"
 )
 
-type SimpleUserInfo struct {
-	Npub    string
-	Name    string
-	Picture string
-	Time    time.Time
+var sys = sdk.System{
+	Pool:             nostr.NewSimplePool(context.Background()),
+	RelaysCache:      cache_memory.New32[[]sdk.Relay](1000),
+	MetadataCache:    cache_memory.New32[sdk.ProfileMetadata](1000),
+	FollowsCache:     cache_memory.New32[[]sdk.Follow](1),
+	RelayListRelays:  []string{"wss://purplepag.es", "wss://relay.nostr.band"},
+	FollowListRelays: []string{"wss://public.relaying.io", "wss://relay.nostr.band"},
+	MetadataRelays:   []string{"wss://nostr-pub.wellorder.net", "wss://purplepag.es", "wss://relay.nostr.band"},
+	Store:            &db,
 }
 
-var (
-	userInfoCache = make(map[string]SimpleUserInfo)
-)
-
-func getUserInfo(ctx context.Context, hexpubkey string) SimpleUserInfo {
-	// check if in cache
-	v, o := userInfoCache[hexpubkey]
-	if o {
-		if !(time.Since(v.Time) > 2*time.Hour) { // use cache for 2 hours
-			return v
+func fetchAndStoreProfile(ctx context.Context, pubkey string) sdk.ProfileMetadata {
+	profile := sys.FetchProfileMetadata(ctx, pubkey)
+	if profile.Event != nil {
+		if _, err := sys.StoreRelay().Publish(ctx, *profile.Event); err != nil {
+			log.Warn().Err(err).Msg("failed to save profile locally")
 		}
 	}
-
-	npub, _ := nip19.EncodePublicKey(hexpubkey)
-	var name string = string(npub)
-	var picture string = ""
-
-	evts, err := db.QueryEvents(ctx, nostr.Filter{
-		Authors: []string{hexpubkey},
-		Kinds:   []int{0},
-		Limit:   1,
-	})
-	if err != nil {
-		return SimpleUserInfo{npub, name, picture, time.Now()}
-	}
-	for ev := range evts {
-		name, picture = getProfileInfoFromJson(ev.Content)
-	}
-
-	userInfoCache[hexpubkey] = SimpleUserInfo{npub, name, picture, time.Now()}
-	return SimpleUserInfo{npub, name, picture, time.Now()}
+	return profile
 }

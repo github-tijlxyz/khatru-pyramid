@@ -8,13 +8,18 @@ import (
 	"github.com/theplant/htmlgo"
 )
 
-// embed ui files
-
 func inviteTreeHandler(w http.ResponseWriter, r *http.Request) {
 	content := inviteTreePageHTML(r.Context(), InviteTreePageParams{
 		LoggedUser: getLoggedUser(r),
 	})
 	htmlgo.Fprint(w, baseHTML(content), r.Context())
+}
+
+func getUserRowHandler(w http.ResponseWriter, r *http.Request) {
+	pubkey := r.PostFormValue("pubkey")
+	profile := fetchAndStoreProfile(r.Context(), pubkey)
+	content := userRowComponent(r.Context(), profile, getLoggedUser(r))
+	htmlgo.Fprint(w, content, r.Context())
 }
 
 func addToWhitelistHandler(w http.ResponseWriter, r *http.Request) {
@@ -29,7 +34,7 @@ func addToWhitelistHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to add to whitelist: "+err.Error(), 500)
 		return
 	}
-	content := buildInviteTree(r.Context(), "", loggedUser)
+	content := inviteTreeComponent(r.Context(), "", loggedUser)
 	htmlgo.Fprint(w, content, r.Context())
 }
 
@@ -40,7 +45,7 @@ func removeFromWhitelistHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to remove from whitelist: "+err.Error(), 500)
 		return
 	}
-	content := buildInviteTree(r.Context(), "", loggedUser)
+	content := inviteTreeComponent(r.Context(), "", loggedUser)
 	htmlgo.Fprint(w, content, r.Context())
 }
 
@@ -157,7 +162,7 @@ func reportsViewerHandler(w http.ResponseWriter, r *http.Request) {
 
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	content := homePageHTML(r.Context(), HomePageParams{
-		RelayOwnerInfo: getUserInfo(context.Background(), s.RelayPubkey),
+		RelayOwnerInfo: fetchAndStoreProfile(context.Background(), s.RelayPubkey),
 	})
 	htmlgo.Fprint(w, baseHTML(content), r.Context())
 }
