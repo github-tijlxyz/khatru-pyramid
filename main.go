@@ -20,6 +20,7 @@ type Settings struct {
 	RelayPubkey      string `envconfig:"RELAY_PUBKEY" required:"true"`
 	RelayDescription string `envconfig:"RELAY_DESCRIPTION"`
 	RelayContact     string `envconfig:"RELAY_CONTACT"`
+	RelayIcon        string `envconfig:"RELAY_ICON"`
 	DatabasePath     string `envconfig:"DATABASE_PATH" default:"./db"`
 }
 
@@ -51,6 +52,7 @@ func main() {
 	relay.PubKey = s.RelayPubkey
 	relay.Description = s.RelayDescription
 	relay.Contact = s.RelayContact
+	relay.IconURL = s.RelayIcon
 
 	relay.StoreEvent = append(relay.StoreEvent, db.SaveEvent)
 	relay.QueryEvents = append(relay.QueryEvents, db.QueryEvents)
