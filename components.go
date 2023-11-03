@@ -39,7 +39,7 @@ func userRowComponent(ctx context.Context, profile sdk.ProfileMetadata, loggedUs
 }
 
 func userNameComponent(profile sdk.ProfileMetadata) HTMLComponent {
-	return A().Href("nostr:" + profile.Npub()).Children(
+	return A().Href("nostr:" + profile.Npub()).Target("_blank").Children(
 		Span(profile.ShortName()).Attr(
 			"npub", profile.Npub(),
 			"name", profile.ShortName(),
