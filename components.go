@@ -27,7 +27,7 @@ func userRowComponent(ctx context.Context, profile sdk.ProfileMetadata, loggedUs
 				"hx-post", "/remove-from-whitelist",
 				"hx-trigger", "click",
 				"hx-target", "#tree",
-				"hx-vals", `{"profile.pubkey": "`+profile.PubKey+`"}`,
+				"hx-vals", `{"pubkey": "`+profile.PubKey+`"}`,
 			)
 	}
 

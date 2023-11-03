@@ -34,23 +34,21 @@ func isPublicKeyInWhitelist(pubkey string) bool {
 	return ok
 }
 
-func isAncestorOf(pubkey string, target string) bool {
-	ancestor := target // we must find out if we are an ancestor of the target, but we can delete ourselves
-	for {
-		if ancestor == pubkey {
-			break
-		}
-
-		parent, ok := whitelist[ancestor]
-		if !ok {
-			// parent is not in whitelist, this means this is a top-level user and can
-			// only be deleted by manually editing the users.json file
-			return false
-		}
-
-		ancestor = parent
+func isAncestorOf(ancestor string, target string) bool {
+	parent, ok := whitelist[target]
+	if !ok {
+		// parent is not in whitelist, this means this is a top-level user and can
+		// only be deleted by manually editing the users.json file
+		return false
 	}
-	return true
+
+	if parent == ancestor {
+		// if the pubkey is the parent, that means it is an ancestor
+		return true
+	}
+
+	// otherwise we climb one degree up and test with the parent of the target
+	return isAncestorOf(ancestor, parent)
 }
 
 func removeFromWhitelist(target string, deleter string) error {
