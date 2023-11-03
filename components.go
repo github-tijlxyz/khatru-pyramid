@@ -20,7 +20,7 @@ func inviteTreeComponent(ctx context.Context, inviter string, loggedUser string)
 
 func userRowComponent(ctx context.Context, profile sdk.ProfileMetadata, loggedUser string) HTMLComponent {
 	button := Span("")
-	if isAncestorOf(loggedUser, profile.PubKey) && loggedUser != profile.PubKey {
+	if isAncestorOf(loggedUser, profile.PubKey) && loggedUser != "" {
 		button = Button("remove").
 			Class(buttonClass+" px-2 bg-red-100 hover:bg-red-300").
 			Attr(
