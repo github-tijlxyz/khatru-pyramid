@@ -1,35 +1,16 @@
-FROM node:latest AS ui-builder
+# syntax=docker/dockerfile:1
+
+FROM golang:1.21
 
 WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
 
 COPY . .
 
-WORKDIR /app/ui
-
-RUN yarn install
-RUN yarn build
-
-
-FROM golang:1.20 AS go-builder
-
-WORKDIR /app
-
-COPY . .
-
-COPY --from=ui-builder /app/ui/dist /app/ui/dist
-
-RUN go build -o app
-
-
-FROM golang:1.20
-
-WORKDIR /app
-
-COPY --from=go-builder /app/app /app/app
-
-COPY --from=ui-builder /app/ui/dist /app/ui/dist
-
+RUN CGO_ENABLED=0 GOOS=linux go build -o /khatru-invite
 
 EXPOSE 3334
 
-CMD ["./app"]
+CMD ["/khatru-invite"]

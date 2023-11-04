@@ -2,6 +2,8 @@ module github.com/github-tijlxyz/khatru-invite
 
 go 1.21.0
 
+toolchain go1.21.3
+
 require (
 	github.com/fiatjaf/eventstore v0.1.0
 	github.com/fiatjaf/khatru v0.0.4
