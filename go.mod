@@ -4,7 +4,7 @@ go 1.21.0
 
 require (
 	github.com/fiatjaf/eventstore v0.1.0
-	github.com/fiatjaf/khatru v0.1.0
+	github.com/fiatjaf/khatru v0.0.4
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/nbd-wtf/go-nostr v0.25.0
 	github.com/nbd-wtf/nostr-sdk v0.0.1
@@ -54,11 +54,3 @@ require (
 	golang.org/x/sys v0.12.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 )
-
-replace github.com/fiatjaf/eventstore => /home/fiatjaf/comp/eventstore
-
-replace github.com/fiatjaf/khatru => /home/fiatjaf/comp/khatru
-
-replace github.com/nbd-wtf/go-nostr => /home/fiatjaf/comp/go-nostr
-
-replace github.com/nbd-wtf/nostr-sdk => /home/fiatjaf/comp/nostr-sdk
