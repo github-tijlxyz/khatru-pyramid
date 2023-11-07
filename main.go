@@ -8,6 +8,7 @@ import (
 
 	"github.com/fiatjaf/eventstore/badger"
 	"github.com/fiatjaf/khatru"
+	"github.com/fiatjaf/khatru/plugins"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/rs/zerolog"
@@ -60,8 +61,16 @@ func main() {
 	relay.DeleteEvent = append(relay.DeleteEvent, db.DeleteEvent)
 	relay.RejectEvent = append(relay.RejectEvent,
 		rejectEventsFromUsersNotInWhitelist,
-		restrictToKinds,
+		plugins.RestrictToSpecifiedKinds(supportedKinds...),
 		validateAndFilterReports,
+	)
+	relay.OverwriteFilter = append(relay.OverwriteFilter,
+		plugins.RemoveAllButKinds(supportedKinds...),
+		removeAuthorsNotWhitelisted,
+	)
+	relay.RejectFilter = append(relay.RejectFilter,
+		plugins.NoSearchQueries,
+		discardFiltersWithTooManyAuthors,
 	)
 
 	// load users registry
