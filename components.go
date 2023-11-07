@@ -11,7 +11,7 @@ func inviteTreeComponent(ctx context.Context, inviter string, loggedUser string)
 	children := make([]HTMLComponent, 0, len(whitelist)/2)
 	for pubkey, invitedBy := range whitelist {
 		if invitedBy == inviter {
-			profile := fetchAndStoreProfile(ctx, pubkey)
+			profile := sys.FetchOrStoreProfileMetadata(ctx, pubkey)
 			children = append(children, userRowComponent(ctx, profile, loggedUser))
 		}
 	}

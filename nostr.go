@@ -18,13 +18,3 @@ var sys = sdk.System{
 	MetadataRelays:   []string{"wss://nostr-pub.wellorder.net", "wss://purplepag.es", "wss://relay.nostr.band"},
 	Store:            &db,
 }
-
-func fetchAndStoreProfile(ctx context.Context, pubkey string) sdk.ProfileMetadata {
-	profile := sys.FetchProfileMetadata(ctx, pubkey)
-	if profile.Event != nil {
-		if _, err := sys.StoreRelay().Publish(ctx, *profile.Event); err != nil {
-			log.Warn().Err(err).Msg("failed to save profile locally")
-		}
-	}
-	return profile
-}

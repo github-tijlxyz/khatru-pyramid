@@ -62,7 +62,7 @@ func reportsViewerHandler(w http.ResponseWriter, r *http.Request) {
 
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	content := homePageHTML(r.Context(), HomePageParams{
-		relayOwnerInfo: fetchAndStoreProfile(r.Context(), s.RelayPubkey),
+		relayOwnerInfo: sys.FetchOrStoreProfileMetadata(r.Context(), s.RelayPubkey),
 	})
 	htmlgo.Fprint(w, baseHTML(content), r.Context())
 }

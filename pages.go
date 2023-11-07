@@ -144,7 +144,7 @@ func reportsPageHTML(ctx context.Context, params ReportsPageParams) HTMLComponen
 				primaryType = (*p)[2]
 			}
 
-			relatedProfile := fetchAndStoreProfile(ctx, (*p)[1])
+			relatedProfile := sys.FetchOrStoreProfileMetadata(ctx, (*p)[1])
 			relatedContent = Div(
 				Text("profile reported: "),
 				userNameComponent(relatedProfile),
