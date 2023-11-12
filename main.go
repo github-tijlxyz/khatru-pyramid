@@ -59,8 +59,8 @@ func main() {
 	relay.QueryEvents = append(relay.QueryEvents, db.QueryEvents)
 	relay.DeleteEvent = append(relay.DeleteEvent, db.DeleteEvent)
 	relay.RejectEvent = append(relay.RejectEvent,
-		rejectEventsFromUsersNotInWhitelist,
 		plugins.RestrictToSpecifiedKinds(supportedKinds...),
+		rejectEventsFromUsersNotInWhitelist,
 		validateAndFilterReports,
 	)
 	relay.OverwriteFilter = append(relay.OverwriteFilter,
@@ -69,7 +69,6 @@ func main() {
 	)
 	relay.RejectFilter = append(relay.RejectFilter,
 		plugins.NoSearchQueries,
-		discardFiltersWithTooManyAuthors,
 	)
 
 	// load users registry
