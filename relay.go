@@ -61,15 +61,12 @@ func validateAndFilterReports(ctx context.Context, event *nostr.Event) (reject b
 	return false, ""
 }
 
-func discardFiltersWithTooManyAuthors(ctx context.Context, filter nostr.Filter) (reject bool, msg string) {
-	if len(filter.Authors) > len(whitelist) {
-		return true, "rejecting query with more authors than we even have in the relay"
-	}
-	return false, ""
-}
-
 func removeAuthorsNotWhitelisted(ctx context.Context, filter *nostr.Filter) {
-	if n := len(filter.Authors); n > 0 {
+	if n := len(filter.Authors); n > len(whitelist)*11/10 {
+		// this query was clearly badly constructed, so we will not bother even looking
+		filter.Limit = 0 // this causes the query to be short cut
+	} else if n > 0 {
+		// otherwise we go through the authors list and remove the irrelevant ones
 		newAuthors := make([]string, 0, n)
 		for i := 0; i < n; i++ {
 			k := filter.Authors[i]
@@ -80,7 +77,7 @@ func removeAuthorsNotWhitelisted(ctx context.Context, filter *nostr.Filter) {
 		filter.Authors = newAuthors
 
 		if len(newAuthors) == 0 {
-			filter.Limit = 0
+			filter.Limit = 0 // this causes the query to be short cut
 		}
 	}
 }
