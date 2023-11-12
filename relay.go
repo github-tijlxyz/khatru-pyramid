@@ -78,5 +78,9 @@ func removeAuthorsNotWhitelisted(ctx context.Context, filter *nostr.Filter) {
 			}
 		}
 		filter.Authors = newAuthors
+
+		if len(newAuthors) == 0 {
+			filter.Limit = 0
+		}
 	}
 }
