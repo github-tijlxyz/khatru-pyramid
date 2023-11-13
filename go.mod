@@ -5,8 +5,8 @@ go 1.21.0
 toolchain go1.21.3
 
 require (
-	github.com/fiatjaf/eventstore v0.2.5
-	github.com/fiatjaf/khatru v0.0.8
+	github.com/fiatjaf/eventstore v0.2.9
+	github.com/fiatjaf/khatru v0.0.11
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/nbd-wtf/go-nostr v0.25.3
 	github.com/nbd-wtf/nostr-sdk v0.0.2
