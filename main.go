@@ -11,6 +11,7 @@ import (
 	"github.com/fiatjaf/khatru/plugins"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/nbd-wtf/go-nostr"
+	"github.com/nbd-wtf/go-nostr/nip11"
 	"github.com/rs/zerolog"
 )
 
@@ -54,6 +55,9 @@ func main() {
 	relay.Info.Description = s.RelayDescription
 	relay.Info.Contact = s.RelayContact
 	relay.Info.Icon = s.RelayIcon
+	relay.Info.Limitation = &nip11.RelayLimitationDocument{
+		RestrictedWrites: true,
+	}
 
 	relay.StoreEvent = append(relay.StoreEvent, db.SaveEvent)
 	relay.QueryEvents = append(relay.QueryEvents, db.QueryEvents)
