@@ -49,11 +49,11 @@ func main() {
 	log.Debug().Str("path", db.Path).Msg("initialized database")
 
 	// init relay
-	relay.Name = s.RelayName
-	relay.PubKey = s.RelayPubkey
-	relay.Description = s.RelayDescription
-	relay.Contact = s.RelayContact
-	relay.IconURL = s.RelayIcon
+	relay.Info.Name = s.RelayName
+	relay.Info.PubKey = s.RelayPubkey
+	relay.Info.Description = s.RelayDescription
+	relay.Info.Contact = s.RelayContact
+	relay.Info.Icon = s.RelayIcon
 
 	relay.StoreEvent = append(relay.StoreEvent, db.SaveEvent)
 	relay.QueryEvents = append(relay.QueryEvents, db.QueryEvents)
