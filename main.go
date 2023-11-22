@@ -8,7 +8,7 @@ import (
 
 	"github.com/fiatjaf/eventstore/badger"
 	"github.com/fiatjaf/khatru"
-	"github.com/fiatjaf/khatru/plugins"
+	"github.com/fiatjaf/khatru/policies"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/nbd-wtf/go-nostr/nip11"
@@ -63,19 +63,21 @@ func main() {
 	relay.QueryEvents = append(relay.QueryEvents, db.QueryEvents)
 	relay.DeleteEvent = append(relay.DeleteEvent, db.DeleteEvent)
 	relay.RejectEvent = append(relay.RejectEvent,
-		plugins.PreventLargeTags(64),
-		plugins.PreventTooManyIndexableTags(8, []int{3, 10002}, nil),
-		plugins.PreventTooManyIndexableTags(1000, nil, []int{3, 10002}),
-		plugins.RestrictToSpecifiedKinds(supportedKinds...),
+		policies.PreventLargeTags(100),
+		policies.PreventTooManyIndexableTags(8, []int{3, 10002}, nil),
+		policies.PreventTooManyIndexableTags(1000, nil, []int{3, 10002}),
+		policies.RestrictToSpecifiedKinds(supportedKinds...),
 		rejectEventsFromUsersNotInWhitelist,
 		validateAndFilterReports,
 	)
 	relay.OverwriteFilter = append(relay.OverwriteFilter,
-		plugins.RemoveAllButKinds(supportedKinds...),
+		policies.RemoveAllButKinds(supportedKinds...),
 		removeAuthorsNotWhitelisted,
 	)
 	relay.RejectFilter = append(relay.RejectFilter,
-		plugins.NoSearchQueries,
+		policies.NoSearchQueries,
+		policies.NoEmptyFilters,
+		policies.AntiSyncBots,
 	)
 
 	// load users registry
