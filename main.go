@@ -77,7 +77,6 @@ func main() {
 	relay.RejectFilter = append(relay.RejectFilter,
 		policies.NoSearchQueries,
 		policies.NoEmptyFilters,
-		policies.AntiSyncBots,
 	)
 
 	// load users registry
