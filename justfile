@@ -3,3 +3,8 @@ dev:
 
 build:
     CC=musl-gcc go build -ldflags='-s -w -linkmode external -extldflags "-static"' -o ./khatru-invite
+
+deploy: build
+    ssh root@turgot 'systemctl stop pyramid';
+    scp khatru-invite turgot:pyramid/khatru-invite
+    ssh root@turgot 'systemctl start pyramid'
