@@ -28,7 +28,7 @@ type Settings struct {
 
 var (
 	s         Settings
-	db        = badger.BadgerBackend{}
+	db        = badger.BadgerBackend{MaxLimit: 50000}
 	log       = zerolog.New(os.Stderr).Output(zerolog.ConsoleWriter{Out: os.Stdout}).With().Timestamp().Logger()
 	whitelist = make(Whitelist)
 	relay     = khatru.NewRelay()
@@ -76,7 +76,6 @@ func main() {
 	)
 	relay.RejectFilter = append(relay.RejectFilter,
 		policies.NoSearchQueries,
-		policies.NoEmptyFilters,
 	)
 
 	// load users registry
