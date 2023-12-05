@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/fiatjaf/eventstore/badger"
+	"github.com/fiatjaf/eventstore/lmdb"
 	"github.com/fiatjaf/khatru"
 	"github.com/fiatjaf/khatru/policies"
 	"github.com/kelseyhightower/envconfig"
@@ -28,7 +28,7 @@ type Settings struct {
 
 var (
 	s         Settings
-	db        = badger.BadgerBackend{MaxLimit: 50000}
+	db        = lmdb.LMDBBackend{MaxLimit: 50000}
 	log       = zerolog.New(os.Stderr).Output(zerolog.ConsoleWriter{Out: os.Stdout}).With().Timestamp().Logger()
 	whitelist = make(Whitelist)
 	relay     = khatru.NewRelay()
