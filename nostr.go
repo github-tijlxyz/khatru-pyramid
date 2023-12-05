@@ -14,7 +14,7 @@ var sys = sdk.System{
 	MetadataCache:    cache_memory.New32[sdk.ProfileMetadata](1000),
 	FollowsCache:     cache_memory.New32[[]sdk.Follow](1),
 	RelayListRelays:  []string{"wss://purplepag.es", "wss://relay.nostr.band"},
-	FollowListRelays: []string{"wss://public.relaying.io", "wss://relay.nostr.band"},
-	MetadataRelays:   []string{"wss://nostr-pub.wellorder.net", "wss://purplepag.es", "wss://relay.nostr.band"},
+	FollowListRelays: []string{"wss://public.relaying.io", "wss://nos.lol"},
+	MetadataRelays:   []string{"wss://nostr-pub.wellorder.net", "wss://purplepag.es", "wss://relay.noswhere.com"},
 	Store:            &db,
 }
