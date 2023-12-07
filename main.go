@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/url"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/fiatjaf/eventstore/lmdb"
 	"github.com/fiatjaf/khatru"
@@ -13,6 +16,7 @@ import (
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/nbd-wtf/go-nostr/nip11"
 	"github.com/rs/zerolog"
+	"golang.org/x/sync/errgroup"
 )
 
 type Settings struct {
@@ -47,6 +51,7 @@ func main() {
 		log.Fatal().Err(err).Msg("failed to initialize database")
 		return
 	}
+	defer db.Close()
 	log.Debug().Str("path", db.Path).Msg("initialized database")
 
 	// init relay
@@ -92,8 +97,18 @@ func main() {
 	relay.Router().HandleFunc("/", homePageHandler)
 
 	log.Info().Msg("running on http://0.0.0.0:" + s.Port)
-	if err := http.ListenAndServe(":"+s.Port, relay); err != nil {
-		log.Fatal().Err(err).Msg("failed to serve")
+
+	server := &http.Server{Addr: ":" + s.Port, Handler: relay}
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer cancel()
+	g, ctx := errgroup.WithContext(ctx)
+	g.Go(server.ListenAndServe)
+	g.Go(func() error {
+		<-ctx.Done()
+		return server.Shutdown(context.Background())
+	})
+	if err := g.Wait(); err != nil {
+		log.Debug().Err(err).Msg("exit reason")
 	}
 }
 

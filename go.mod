@@ -12,6 +12,7 @@ require (
 	github.com/nbd-wtf/nostr-sdk v0.0.2
 	github.com/rs/zerolog v1.31.0
 	github.com/theplant/htmlgo v1.0.3
+	golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f
 )
 
 require (
@@ -46,5 +47,6 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.47.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
+	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sys v0.14.0 // indirect
 )
