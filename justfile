@@ -2,7 +2,7 @@ dev:
     godotenv go run .
 
 build:
-    CC=musl-gcc go build -ldflags='-s -w -linkmode external -extldflags "-static"' -o ./khatru-invite
+    CC=musl-gcc go build -ldflags='-linkmode external -extldflags "-static"' -o ./khatru-invite
 
 deploy: build
     ssh root@turgot 'systemctl stop pyramid';
