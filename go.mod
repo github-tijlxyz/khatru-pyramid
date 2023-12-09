@@ -5,19 +5,19 @@ go 1.21.0
 toolchain go1.21.3
 
 require (
-	github.com/fiatjaf/eventstore v0.2.9
-	github.com/fiatjaf/khatru v0.1.0
+	github.com/fiatjaf/eventstore v0.2.15
+	github.com/fiatjaf/khatru v0.2.0
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/nbd-wtf/go-nostr v0.25.7
-	github.com/nbd-wtf/nostr-sdk v0.0.2
+	github.com/nbd-wtf/go-nostr v0.26.4
+	github.com/nbd-wtf/nostr-sdk v0.0.4
 	github.com/rs/zerolog v1.31.0
 	github.com/theplant/htmlgo v1.0.3
-	golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f
+	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
 )
 
 require (
+	github.com/PowerDNS/lmdb-go v1.9.2 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
-	github.com/bmatsuo/lmdb-go v1.8.0 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.3.2 // indirect
 	github.com/btcsuite/btcd/btcutil v1.1.3 // indirect
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.0.2 // indirect
@@ -47,6 +47,5 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.47.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
-	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sys v0.14.0 // indirect
 )
