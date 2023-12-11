@@ -5,10 +5,10 @@ go 1.21.0
 toolchain go1.21.3
 
 require (
-	github.com/fiatjaf/eventstore v0.2.15
-	github.com/fiatjaf/khatru v0.2.0
+	github.com/fiatjaf/eventstore v0.3.0
+	github.com/fiatjaf/khatru v0.2.1
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/nbd-wtf/go-nostr v0.26.4
+	github.com/nbd-wtf/go-nostr v0.27.1
 	github.com/nbd-wtf/nostr-sdk v0.0.4
 	github.com/rs/zerolog v1.31.0
 	github.com/theplant/htmlgo v1.0.3
@@ -41,6 +41,7 @@ require (
 	github.com/puzpuzpuz/xsync/v2 v2.5.1 // indirect
 	github.com/rs/cors v1.7.0 // indirect
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
+	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a // indirect
 	github.com/tidwall/gjson v1.17.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
