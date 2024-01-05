@@ -6,10 +6,10 @@ toolchain go1.21.3
 
 require (
 	github.com/fiatjaf/eventstore v0.3.1
-	github.com/fiatjaf/khatru v0.2.1
+	github.com/fiatjaf/khatru v0.0.0-00010101000000-000000000000
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/nbd-wtf/go-nostr v0.27.1
-	github.com/nbd-wtf/nostr-sdk v0.0.4
+	github.com/nbd-wtf/go-nostr v0.27.5
+	github.com/nbd-wtf/nostr-sdk v0.0.5
 	github.com/rs/zerolog v1.31.0
 	github.com/theplant/htmlgo v1.0.3
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
@@ -24,7 +24,6 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/decred/dcrd/crypto/blake256 v1.0.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
-	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fasthttp/websocket v1.5.3 // indirect
 	github.com/fiatjaf/generic-ristretto v0.0.1 // indirect
@@ -50,3 +49,7 @@ require (
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/sys v0.14.0 // indirect
 )
+
+replace github.com/fiatjaf/khatru => /home/fiatjaf/comp/khatru
+
+replace github.com/fiatjaf/eventstore => /home/fiatjaf/comp/eventstore
