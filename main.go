@@ -93,8 +93,7 @@ func main() {
 	relay.Router().HandleFunc("/add-to-whitelist", addToWhitelistHandler)
 	relay.Router().HandleFunc("/remove-from-whitelist", removeFromWhitelistHandler)
 	relay.Router().HandleFunc("/reports", reportsViewerHandler)
-	relay.Router().HandleFunc("/users", inviteTreeHandler)
-	relay.Router().HandleFunc("/", homePageHandler)
+	relay.Router().HandleFunc("/", inviteTreeHandler)
 
 	log.Info().Msg("running on http://0.0.0.0:" + s.Port)
 

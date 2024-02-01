@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/nbd-wtf/go-nostr"
-	sdk "github.com/nbd-wtf/nostr-sdk"
 	. "github.com/theplant/htmlgo"
 )
 
@@ -28,8 +27,7 @@ func baseHTML(inside HTMLComponent) HTMLComponent {
 				P().Text(s.RelayDescription).Class("text-lg"),
 			).Class("mx-auto my-6 text-center"),
 			Nav(
-				A().Text("information").Href("/").Class(navItemClass).Attr("hx-boost", "true", "hx-target", "main", "hx-select", "main"),
-				A().Text("invite tree").Href("/users").Class(navItemClass).Attr("hx-boost", "true", "hx-target", "main", "hx-select", "main"),
+				A().Text("invite tree").Href("/").Class(navItemClass).Attr("hx-boost", "true", "hx-target", "main", "hx-select", "main"),
 				A().Text("reports").Href("/reports").Class(navItemClass).Attr("hx-boost", "true", "hx-target", "main", "hx-select", "main"),
 				A().Text("").Href("#").Class(navItemClass).
 					Attr("_", `
@@ -39,41 +37,6 @@ on load get cookies['nip98'] then if it is undefined set my innerText to "login"
 			).Class("flex flex-1 items-center justify-center"),
 			Main(inside).Class("m-4"),
 		).Class("mx-4 my-6"),
-	)
-}
-
-type HomePageParams struct {
-	relayOwnerInfo sdk.ProfileMetadata
-}
-
-func homePageHTML(ctx context.Context, params HomePageParams) HTMLComponent {
-	contact := Div()
-	if s.RelayContact != "" {
-		contact = Div().Text("alternative contact: " + s.RelayContact)
-	}
-
-	description := Div()
-	if s.RelayDescription != "" {
-		description = Div().Text("description: " + s.RelayDescription)
-	}
-
-	return Div(
-		Div().Text("name: "+s.RelayName),
-		description,
-		contact,
-		Div(
-			Text("relay master: "),
-			userNameComponent(params.relayOwnerInfo),
-		),
-		Br(),
-		Div(
-			Text("this relay uses"),
-			A().Target("_blank").Href("https://github.com/github-tijlxyz/khatru-invite").Text("Khatru Invite").
-				Class("underline"),
-			Text(" which is built with "),
-			A().Target("_blank").Href("https://github.com/fiatjaf/khatru").Text("Khatru").
-				Class("underline"),
-		).Class("text-sm"),
 	)
 }
 

@@ -59,10 +59,3 @@ func reportsViewerHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	htmlgo.Fprint(w, content, r.Context())
 }
-
-func homePageHandler(w http.ResponseWriter, r *http.Request) {
-	content := homePageHTML(r.Context(), HomePageParams{
-		relayOwnerInfo: sys.FetchOrStoreProfileMetadata(r.Context(), s.RelayPubkey),
-	})
-	htmlgo.Fprint(w, baseHTML(content), r.Context())
-}
