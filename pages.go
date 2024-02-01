@@ -36,7 +36,11 @@ on click if my innerText is equal to "login" get window.nostr.signEvent({created
 on load get cookies['nip98'] then if it is undefined set my innerText to "login" otherwise set my innerText to "logout"`),
 			).Class("flex flex-1 items-center justify-center"),
 			Main(inside).Class("m-4"),
-		).Class("mx-4 my-6"),
+			P(
+				Text("powered by "),
+				A().Href("https://github.com/github-tijlxyz/khatru-invite").Text("khatru-invite").Class("hover:underline cursor-pointer text-blue-500"),
+			).Class("text-end my-4 text-sm"),
+		).Class("my-6 mx-auto max-w-min min-w-96"),
 	)
 }
 
@@ -50,13 +54,13 @@ func inviteTreePageHTML(ctx context.Context, params InviteTreePageParams) HTMLCo
 	if params.loggedUser != "" {
 		inviteForm = Form(
 			Input("pubkey").Type("text").Placeholder("npub1...").Class("w-96 rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"),
-			Button("invite").Class(buttonClass+" p-2 bg-white hover:bg-gray-50"),
+			Button("invite").Class(buttonClass+" ml-2 p-2 bg-white hover:bg-gray-50"),
 		).Attr(
 			"hx-post", "/add-to-whitelist",
 			"hx-trigger", "submit",
 			"hx-target", "#tree",
 			"_", "on htmx:afterRequest(elt, successful) if successful and elt is I call I.reset()",
-		)
+		).Class("flex")
 	}
 
 	return Div(
