@@ -17,7 +17,7 @@ func addToWhitelist(pubkey string, inviter string) error {
 		return fmt.Errorf("pubkey %s doesn't have permission to invite", inviter)
 	}
 
-	if !nostr.IsValidPublicKeyHex(pubkey) {
+	if !nostr.IsValidPublicKey(pubkey) {
 		return fmt.Errorf("pubkey invalid: %s", pubkey)
 	}
 
@@ -32,6 +32,19 @@ func addToWhitelist(pubkey string, inviter string) error {
 func isPublicKeyInWhitelist(pubkey string) bool {
 	_, ok := whitelist[pubkey]
 	return ok
+}
+
+func hasInvitedAtLeast(ancestor string, target int) bool {
+	count := 0
+	for _, inviter := range whitelist {
+		if inviter == ancestor {
+			count++
+		}
+		if count >= target {
+			return true
+		}
+	}
+	return false
 }
 
 func isAncestorOf(ancestor string, target string) bool {

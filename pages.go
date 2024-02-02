@@ -51,7 +51,7 @@ type InviteTreePageParams struct {
 func inviteTreePageHTML(ctx context.Context, params InviteTreePageParams) HTMLComponent {
 	inviteForm := Div()
 
-	if params.loggedUser != "" {
+	if params.loggedUser != "" && !hasInvitedAtLeast(params.loggedUser, s.MaxInvitesPerPerson) {
 		inviteForm = Form(
 			Input("pubkey").Type("text").Placeholder("npub1...").Class("w-96 rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"),
 			Button("invite").Class(buttonClass+" ml-2 p-2 bg-white hover:bg-gray-50"),

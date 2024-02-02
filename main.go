@@ -28,6 +28,8 @@ type Settings struct {
 	RelayContact     string `envconfig:"RELAY_CONTACT"`
 	RelayIcon        string `envconfig:"RELAY_ICON"`
 	DatabasePath     string `envconfig:"DATABASE_PATH" default:"./db"`
+
+	MaxInvitesPerPerson int `envconfig:"MAX_INVITES_PER_PERSON" default:"3"`
 }
 
 var (

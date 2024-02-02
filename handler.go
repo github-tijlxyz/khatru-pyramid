@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/nbd-wtf/go-nostr"
@@ -21,6 +22,11 @@ func addToWhitelistHandler(w http.ResponseWriter, r *http.Request) {
 	pubkey := r.PostFormValue("pubkey")
 	if pfx, value, err := nip19.Decode(pubkey); err == nil && pfx == "npub" {
 		pubkey = value.(string)
+	}
+
+	if hasInvitedAtLeast(loggedUser, s.MaxInvitesPerPerson) {
+		http.Error(w, fmt.Sprintf("cannot invite more than %d", s.MaxInvitesPerPerson), 403)
+		return
 	}
 
 	if err := addToWhitelist(pubkey, loggedUser); err != nil {
