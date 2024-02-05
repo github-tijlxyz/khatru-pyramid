@@ -24,7 +24,7 @@ func addToWhitelistHandler(w http.ResponseWriter, r *http.Request) {
 		pubkey = value.(string)
 	}
 
-	if hasInvitedAtLeast(loggedUser, s.MaxInvitesPerPerson) {
+	if loggedUser != s.RelayPubkey && hasInvitedAtLeast(loggedUser, s.MaxInvitesPerPerson) {
 		http.Error(w, fmt.Sprintf("cannot invite more than %d", s.MaxInvitesPerPerson), 403)
 		return
 	}
