@@ -6,7 +6,7 @@ toolchain go1.21.6
 
 require (
 	github.com/fiatjaf/eventstore v0.3.8
-	github.com/fiatjaf/khatru v0.0.0-00010101000000-000000000000
+	github.com/fiatjaf/khatru v0.3.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/nbd-wtf/go-nostr v0.28.1
 	github.com/nbd-wtf/nostr-sdk v0.0.5
@@ -50,7 +50,3 @@ require (
 	golang.org/x/net v0.18.0 // indirect
 	golang.org/x/sys v0.14.0 // indirect
 )
-
-replace github.com/fiatjaf/khatru => /home/fiatjaf/comp/khatru
-
-replace github.com/fiatjaf/eventstore => /home/fiatjaf/comp/eventstore
