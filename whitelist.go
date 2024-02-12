@@ -8,8 +8,6 @@ import (
 	"github.com/nbd-wtf/go-nostr"
 )
 
-const WHITELIST_FILE = "users.json"
-
 type Whitelist map[string]string // { [user_pubkey]: [invited_by] }
 
 func addToWhitelist(pubkey string, inviter string) error {
@@ -89,7 +87,7 @@ func removeDescendantsFromWhitelist(ancestor string) {
 }
 
 func loadWhitelist() error {
-	b, err := os.ReadFile(WHITELIST_FILE)
+	b, err := os.ReadFile(s.UserdataPath)
 	if err != nil {
 		return err
 	}
@@ -107,7 +105,7 @@ func saveWhitelist() error {
 		return err
 	}
 
-	if err := os.WriteFile(WHITELIST_FILE, jsonBytes, 0644); err != nil {
+	if err := os.WriteFile(s.UserdataPath, jsonBytes, 0644); err != nil {
 		return err
 	}
 
