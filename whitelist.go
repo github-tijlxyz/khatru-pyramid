@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 
@@ -89,7 +90,20 @@ func removeDescendantsFromWhitelist(ancestor string) {
 func loadWhitelist() error {
 	b, err := os.ReadFile(s.UserdataPath)
 	if err != nil {
-		return err
+		// If the whitelist file does not exist, with RELAY_PUBKEY
+		if errors.Is(err, os.ErrNotExist) {
+			whitelist[s.RelayPubkey] = ""
+			jsonBytes, err := json.Marshal(&whitelist)
+			if err != nil {
+				return err
+			}
+			if err := os.WriteFile(s.UserdataPath, jsonBytes, 0644); err != nil {
+				return err
+			}
+			return nil
+		} else {
+			return err
+		}
 	}
 
 	if err := json.Unmarshal(b, &whitelist); err != nil {
