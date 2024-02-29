@@ -38,7 +38,7 @@ on load get cookies['nip98'] then if it is undefined set my innerText to "login"
 			Main(inside).Class("m-4"),
 			P(
 				Text("powered by "),
-				A().Href("https://github.com/github-tijlxyz/khatru-invite").Text("khatru-invite").Class("hover:underline cursor-pointer text-blue-500"),
+				A().Href("https://github.com/github-tijlxyz/khatru-pyramid").Text("khatru-pyramid").Class("hover:underline cursor-pointer text-blue-500"),
 			).Class("text-end my-4 text-sm"),
 		).Class("my-6 mx-auto max-w-min min-w-96"),
 	)
