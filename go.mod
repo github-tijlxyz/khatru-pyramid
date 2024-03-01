@@ -1,4 +1,4 @@
-module github.com/github-tijlxyz/khatru-invite
+module github.com/github-tijlxyz/khatru-pyramid
 
 go 1.21.4
 
