@@ -35,14 +35,13 @@ type Settings struct {
 
 var (
 	s         Settings
-	db        = lmdb.LMDBBackend{MaxLimit: 50000}
+	db        = lmdb.LMDBBackend{MaxLimit: 500}
 	log       = zerolog.New(os.Stderr).Output(zerolog.ConsoleWriter{Out: os.Stdout}).With().Timestamp().Logger()
 	whitelist = make(Whitelist)
 	relay     = khatru.NewRelay()
 )
 
 func main() {
-
 	err := envconfig.Process("", &s)
 	if err != nil {
 		log.Fatal().Err(err).Msg("couldn't process envconfig")
