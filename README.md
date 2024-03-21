@@ -29,3 +29,10 @@ $ go build # or run
 $ DOMAIN=example.com RELAY_NAME=test RELAY_PUBKEY=yourpubkey ./khatru-pyramid
 ```
 
+### Configuration
+
+Format `users.json` as follows:
+
+```json
+{ "[user_pubkey_hex]": "[invited_by_pubkey_hex]" }
+```
