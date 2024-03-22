@@ -4,8 +4,8 @@ A relay based on [Khatru](https://github.com/fiatjaf/khatru) with a invite hiera
 
 ### Deploy with docker
 
-```
-$ docker run \
+```sh
+docker run \
     -p 3334:3334 \
     -v ./users.json:/app/users.json \
     -v ./db:/app/db \
@@ -22,17 +22,19 @@ $ docker run \
 
 ### Manually build
 
-```
-$ git clone https://github.com/github-tijlxyz/khatru-pyramid 
-$ cd khatru-pyramid
-$ go build # or run
-$ DOMAIN=example.com RELAY_NAME=test RELAY_PUBKEY=yourpubkey ./khatru-pyramid
+```sh
+git clone https://github.com/github-tijlxyz/khatru-pyramid && cd khatru-pyramid
+just build
+DOMAIN="example.com" RELAY_NAME="my relay" RELAY_PUBKEY=yourpubkey ./khatru-pyramid
 ```
 
 ### Configuration
 
-Format `users.json` as follows:
+Look at [example.env](./example.env) for all configuration options.
 
+You can also manually edit the `users.json` file. Do this only when the server is down.
+`users.json` is formatted as follows:
 ```json
 { "[user_pubkey_hex]": "[invited_by_pubkey_hex]" }
 ```
+
