@@ -5,11 +5,11 @@ go 1.21.4
 toolchain go1.21.6
 
 require (
-	github.com/fiatjaf/eventstore v0.3.8
-	github.com/fiatjaf/khatru v0.3.1
+	github.com/fiatjaf/eventstore v0.3.13
+	github.com/fiatjaf/khatru v0.3.2
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/nbd-wtf/go-nostr v0.28.1
-	github.com/nbd-wtf/nostr-sdk v0.0.5
+	github.com/nbd-wtf/go-nostr v0.29.3
+	github.com/nbd-wtf/nostr-sdk v0.1.0
 	github.com/rs/zerolog v1.31.0
 	github.com/theplant/htmlgo v1.0.3
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
@@ -31,6 +31,7 @@ require (
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.3.1 // indirect
 	github.com/golang/glog v1.1.2 // indirect
+	github.com/graph-gophers/dataloader/v7 v7.1.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.17.3 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
