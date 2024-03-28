@@ -48,6 +48,8 @@ func main() {
 		return
 	}
 
+	sys.Init()
+
 	// load db
 	db.Path = s.DatabasePath
 	if err := db.Init(); err != nil {
