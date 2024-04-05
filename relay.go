@@ -79,7 +79,7 @@ func validateAndFilterReports(ctx context.Context, event *nostr.Event) (reject b
 func removeAuthorsNotWhitelisted(ctx context.Context, filter *nostr.Filter) {
 	if n := len(filter.Authors); n > len(whitelist)*11/10 {
 		// this query was clearly badly constructed, so we will not bother even looking
-		filter.Limit = -1 // this causes the query to be short cut
+		filter.LimitZero = true // this causes the query to be short cut
 	} else if n > 0 {
 		// otherwise we go through the authors list and remove the irrelevant ones
 		newAuthors := make([]string, 0, n)
@@ -92,7 +92,7 @@ func removeAuthorsNotWhitelisted(ctx context.Context, filter *nostr.Filter) {
 		filter.Authors = newAuthors
 
 		if len(newAuthors) == 0 {
-			filter.Limit = -1 // this causes the query to be short cut
+			filter.LimitZero = true // this causes the query to be short cut
 		}
 	}
 }
