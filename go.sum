@@ -47,8 +47,8 @@ github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkp
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
 github.com/fasthttp/websocket v1.5.7 h1:0a6o2OfeATvtGgoMKleURhLT6JqWPg7fYfWnH4KHau4=
 github.com/fasthttp/websocket v1.5.7/go.mod h1:bC4fxSono9czeXHQUVKxsC0sNjbm7lPJR04GDFqClfU=
-github.com/fiatjaf/eventstore v0.3.13 h1:sR1P0KsfbmdyMyjrdzSj3M75080H6f2oSQv0QiTKVGQ=
-github.com/fiatjaf/eventstore v0.3.13/go.mod h1:OH3Ntce3rZFIEGJ/K6raC1JUwSXksanKBF77naZvfdg=
+github.com/fiatjaf/eventstore v0.4.1 h1:Wbn1NKbLfYO0Yd7wruDoXXbEVW6dluoUgbWRAkn2RxA=
+github.com/fiatjaf/eventstore v0.4.1/go.mod h1:Ai1fEKP2eRo/mMyvVXcXItxFrOI0gYOmO9IMDeEVde4=
 github.com/fiatjaf/generic-ristretto v0.0.1 h1:LUJSU87X/QWFsBXTwnH3moFe4N8AjUxT+Rfa0+bo6YM=
 github.com/fiatjaf/generic-ristretto v0.0.1/go.mod h1:cvV6ANHDA/GrfzVrig7N7i6l8CWnkVZvtQ2/wk9DPVE=
 github.com/fiatjaf/khatru v0.4.0 h1:zN/7dp6LSYtIIvRTc1+U38V8e+yDHZ/X5Mt4Aco6cGE=
