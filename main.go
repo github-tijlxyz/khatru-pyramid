@@ -69,6 +69,8 @@ func main() {
 		RestrictedWrites: true,
 	}
 
+	policies.ApplySaneDefaults(relay)
+
 	relay.StoreEvent = append(relay.StoreEvent, db.SaveEvent)
 	relay.QueryEvents = append(relay.QueryEvents, db.QueryEvents)
 	relay.DeleteEvent = append(relay.DeleteEvent, db.DeleteEvent)
