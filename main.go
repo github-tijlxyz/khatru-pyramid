@@ -90,6 +90,9 @@ func main() {
 		policies.NoSearchQueries,
 	)
 
+	relay.ManagementAPI.AllowPubKey = allowPubKeyHandler
+	relay.ManagementAPI.BanPubKey = banPubKeyHandler
+
 	// load users registry
 	if err := loadWhitelist(); err != nil {
 		log.Fatal().Err(err).Msg("failed to load whitelist")
