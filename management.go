@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/fiatjaf/khatru"
+	"github.com/nbd-wtf/go-nostr/nip86"
 )
 
 func allowPubKeyHandler(ctx context.Context, pubkey, reason string) error {
@@ -35,4 +36,14 @@ func banPubKeyHandler(ctx context.Context, pubkey, reason string) error {
 	removeDescendantsFromWhitelist(pubkey)
 
 	return saveWhitelist()
+}
+
+func listAllowedPubKeysHandler(ctx context.Context) ([]nip86.PubKeyReason, error) {
+	list := make([]nip86.PubKeyReason, len(whitelist))
+	i := 0
+	for pubkey, inviter := range whitelist {
+		list[i] = nip86.PubKeyReason{PubKey: pubkey, Reason: fmt.Sprintf("invited by %s", inviter)}
+		i++
+	}
+	return list, nil
 }

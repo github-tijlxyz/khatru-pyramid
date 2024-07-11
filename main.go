@@ -92,6 +92,7 @@ func main() {
 
 	relay.ManagementAPI.AllowPubKey = allowPubKeyHandler
 	relay.ManagementAPI.BanPubKey = banPubKeyHandler
+	relay.ManagementAPI.ListAllowedPubKeys = listAllowedPubKeysHandler
 
 	// load users registry
 	if err := loadWhitelist(); err != nil {
