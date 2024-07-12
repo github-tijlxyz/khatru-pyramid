@@ -42,7 +42,11 @@ func listAllowedPubKeysHandler(ctx context.Context) ([]nip86.PubKeyReason, error
 	list := make([]nip86.PubKeyReason, len(whitelist))
 	i := 0
 	for pubkey, inviter := range whitelist {
-		list[i] = nip86.PubKeyReason{PubKey: pubkey, Reason: fmt.Sprintf("invited by %s", inviter)}
+		reason := fmt.Sprintf("invited by %s", inviter)
+		if inviter == "" {
+			reason = "root user"
+		}
+		list[i] = nip86.PubKeyReason{PubKey: pubkey, Reason: reason}
 		i++
 	}
 	return list, nil
