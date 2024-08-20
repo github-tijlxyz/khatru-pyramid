@@ -4,7 +4,7 @@ dev:
 build:
     CC=musl-gcc go build -ldflags='-linkmode external -extldflags "-static"' -o ./khatru-pyramid
 
-deploy: build
-    ssh root@cantillon 'systemctl stop pyramid';
-    scp khatru-invite cantillon:pyramid/khatru-invite
-    ssh root@cantillon 'systemctl start pyramid'
+deploy target: build
+    ssh root@{{target}} 'systemctl stop pyramid';
+    scp khatru-pyramid {{target}}:pyramid/khatru-invite
+    ssh root@{{target}} 'systemctl start pyramid'
