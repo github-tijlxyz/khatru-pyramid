@@ -1,12 +1,12 @@
 module github.com/github-tijlxyz/khatru-pyramid
 
-go 1.22
+go 1.23.0
 
 require (
-	github.com/fiatjaf/eventstore v0.5.1
-	github.com/fiatjaf/khatru v0.7.5
+	github.com/fiatjaf/eventstore v0.8.2
+	github.com/fiatjaf/khatru v0.8.1
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/nbd-wtf/go-nostr v0.34.7
+	github.com/nbd-wtf/go-nostr v0.35.0
 	github.com/nbd-wtf/nostr-sdk v0.1.0
 	github.com/rs/zerolog v1.31.0
 	github.com/theplant/htmlgo v1.0.3
@@ -36,7 +36,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/puzpuzpuz/xsync/v3 v3.0.2 // indirect
+	github.com/puzpuzpuz/xsync/v3 v3.4.0 // indirect
 	github.com/rs/cors v1.7.0 // indirect
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
 	github.com/tidwall/gjson v1.17.0 // indirect
