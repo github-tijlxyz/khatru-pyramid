@@ -79,7 +79,7 @@ func main() {
 		policies.PreventLargeTags(100),
 		policies.PreventTooManyIndexableTags(8, []int{3, 10002}, nil),
 		policies.PreventTooManyIndexableTags(1000, nil, []int{3, 10002}),
-		policies.RestrictToSpecifiedKinds(supportedKinds...),
+		policies.RestrictToSpecifiedKinds(true, supportedKinds...),
 		rejectEventsFromUsersNotInWhitelist,
 		validateAndFilterReports,
 	)
