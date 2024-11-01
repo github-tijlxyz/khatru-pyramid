@@ -65,3 +65,30 @@ func reportsViewerHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	htmlgo.Fprint(w, content, r.Context())
 }
+
+func joubleHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, `
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>pyramid</title>
+    <script>
+window.relayGroups = [{
+  groupName: 'pyramid',
+  relayUrls: [location.href.replace('http', 'ws').replace('/browse', '')],
+  isActive: true,
+}]
+window.hideRelaySettings = true
+</script>
+    <script type="module" crossorigin src="https://unpkg.com/jouble/dist/index.js"></script>
+    <link rel="stylesheet" crossorigin href="https://unpkg.com/jouble/dist/index.css">
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script src="https://unpkg.com/window.nostr.js/dist/window.nostr.js"></script>
+  </body>
+</html>
+`)
+}

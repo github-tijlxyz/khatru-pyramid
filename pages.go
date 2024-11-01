@@ -28,6 +28,7 @@ func baseHTML(inside HTMLComponent) HTMLComponent {
 			).Class("mx-auto my-6 text-center"),
 			Nav(
 				A().Text("invite tree").Href("/").Class(navItemClass).Attr("hx-boost", "true", "hx-target", "main", "hx-select", "main"),
+				A().Text("browse").Href("/browse").Class(navItemClass),
 				A().Text("reports").Href("/reports").Class(navItemClass).Attr("hx-boost", "true", "hx-target", "main", "hx-select", "main"),
 				A().Text("").Href("#").Class(navItemClass).
 					Attr("_", `
