@@ -86,7 +86,7 @@ func reportsPageHTML(ctx context.Context, params ReportsPageParams) HTMLComponen
 
 		if e := report.Tags.GetFirst([]string{"e", ""}); e != nil {
 			// event report
-			res, _ := sys.StoreRelay().QuerySync(ctx, nostr.Filter{IDs: []string{(*e)[1]}})
+			res, _ := sys.StoreRelay.QuerySync(ctx, nostr.Filter{IDs: []string{(*e)[1]}})
 			if len(res) == 0 {
 				sys.Store.DeleteEvent(ctx, report)
 				continue
@@ -112,7 +112,7 @@ func reportsPageHTML(ctx context.Context, params ReportsPageParams) HTMLComponen
 				primaryType = (*p)[2]
 			}
 
-			relatedProfile := sys.FetchOrStoreProfileMetadata(ctx, (*p)[1])
+			relatedProfile := sys.FetchProfileMetadata(ctx, (*p)[1])
 			relatedContent = Div(
 				Text("profile reported: "),
 				userNameComponent(relatedProfile),

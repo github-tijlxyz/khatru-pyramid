@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	sdk "github.com/nbd-wtf/nostr-sdk"
+	sdk "github.com/nbd-wtf/go-nostr/sdk"
 	. "github.com/theplant/htmlgo"
 )
 
@@ -11,7 +11,7 @@ func inviteTreeComponent(ctx context.Context, inviter string, loggedUser string)
 	children := make([]HTMLComponent, 0, len(whitelist)/2)
 	for pubkey, invitedBy := range whitelist {
 		if invitedBy == inviter {
-			profile := sys.FetchOrStoreProfileMetadata(ctx, pubkey)
+			profile := sys.FetchProfileMetadata(ctx, pubkey)
 			children = append(children, userRowComponent(ctx, profile, loggedUser))
 		}
 	}

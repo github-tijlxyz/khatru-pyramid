@@ -66,7 +66,7 @@ func validateAndFilterReports(ctx context.Context, event *nostr.Event) (reject b
 	if event.Kind == 1985 {
 		if e := event.Tags.GetFirst([]string{"e", ""}); e != nil {
 			// event report: check if the target event is here
-			res, _ := sys.StoreRelay().QuerySync(ctx, nostr.Filter{IDs: []string{(*e)[1]}})
+			res, _ := sys.StoreRelay.QuerySync(ctx, nostr.Filter{IDs: []string{(*e)[1]}})
 			if len(res) == 0 {
 				return true, "we don't know anything about the target event"
 			}
