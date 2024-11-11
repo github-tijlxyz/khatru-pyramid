@@ -4,4 +4,6 @@ import (
 	sdk "github.com/nbd-wtf/go-nostr/sdk"
 )
 
-var sys = sdk.NewSystem()
+var sys = sdk.NewSystem(
+	sdk.WithStore(db),
+)
