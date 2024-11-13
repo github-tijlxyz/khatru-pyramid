@@ -17,8 +17,8 @@ docker run \
 
 ### Deploy with
 
- - [YunoHost](https://github.com/YunoHost-Apps/khatru-pyramid_ynh) ([app catalog](https://apps.yunohost.org/catalog) [pending](https://github.com/YunoHost/apps/pull/2077))
- - [Cloudron](https://github.com/github-tijlxyz/khatru-pyramid_cloudron) ([app catalog](https://www.cloudron.io/store/index.html) [pending](https://forum.cloudron.io/topic/11146/khatru-pyramid-a-nostr-relay))
+ - [YunoHost](https://github.com/YunoHost-Apps/khatru-pyramid_ynh) ([app catalog](https://apps.yunohost.org/app/khatru-pyramid))
+ - [Cloudron](https://github.com/github-tijlxyz/khatru-pyramid_cloudron) ([app catalog pending](https://forum.cloudron.io/topic/11146/khatru-pyramid-a-nostr-relay))
 
 ### Manually build
 
