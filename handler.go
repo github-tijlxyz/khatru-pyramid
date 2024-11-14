@@ -72,6 +72,7 @@ func joubleHandler(w http.ResponseWriter, r *http.Request) {
 <html>
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>pyramid</title>
     <script>
 window.relayGroups = [{

@@ -107,7 +107,7 @@ func main() {
 	relay.Router().HandleFunc("/add-to-whitelist", addToWhitelistHandler)
 	relay.Router().HandleFunc("/remove-from-whitelist", removeFromWhitelistHandler)
 	relay.Router().HandleFunc("/reports", reportsViewerHandler)
-	relay.Router().HandleFunc("/browse", joubleHandler)
+	relay.Router().HandleFunc("/browse/", joubleHandler)
 	relay.Router().Handle("/static/", http.FileServer(http.FS(static)))
 	relay.Router().HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		if s.RelayIcon != "" {
