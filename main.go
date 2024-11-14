@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"encoding/json"
 	"net/http"
 	"net/url"
@@ -40,6 +41,9 @@ var (
 	whitelist = make(Whitelist)
 	relay     = khatru.NewRelay()
 )
+
+//go:embed static/*
+var static embed.FS
 
 func main() {
 	err := envconfig.Process("", &s)
@@ -104,6 +108,14 @@ func main() {
 	relay.Router().HandleFunc("/remove-from-whitelist", removeFromWhitelistHandler)
 	relay.Router().HandleFunc("/reports", reportsViewerHandler)
 	relay.Router().HandleFunc("/browse", joubleHandler)
+	relay.Router().Handle("/static/", http.FileServer(http.FS(static)))
+	relay.Router().HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		if s.RelayIcon != "" {
+			http.Redirect(w, r, s.RelayIcon, 302)
+		} else {
+			http.Redirect(w, r, "/static/icon.png", 302)
+		}
+	})
 	relay.Router().HandleFunc("/", inviteTreeHandler)
 
 	log.Info().Msg("running on http://0.0.0.0:" + s.Port)
