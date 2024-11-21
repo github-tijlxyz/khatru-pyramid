@@ -3,7 +3,7 @@ module github.com/github-tijlxyz/khatru-pyramid
 go 1.23.1
 
 require (
-	github.com/fiatjaf/eventstore v0.13.0
+	github.com/fiatjaf/eventstore v0.14.0
 	github.com/fiatjaf/khatru v0.11.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/nbd-wtf/go-nostr v0.42.0
@@ -13,6 +13,7 @@ require (
 )
 
 require (
+	fiatjaf.com/lib v0.2.0 // indirect
 	github.com/PowerDNS/lmdb-go v1.9.2 // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/bep/debounce v1.2.1 // indirect

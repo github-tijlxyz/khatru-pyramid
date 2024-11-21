@@ -1,3 +1,5 @@
+fiatjaf.com/lib v0.2.0 h1:TgIJESbbND6GjOgGHxF5jsO6EMjuAxIzZHPo5DXYexs=
+fiatjaf.com/lib v0.2.0/go.mod h1:Ycqq3+mJ9jAWu7XjbQI1cVr+OFgnHn79dQR5oTII47g=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/PowerDNS/lmdb-go v1.9.2 h1:Cmgerh9y3ZKBZGz1irxSShhfmFyRUh+Zdk4cZk7ZJvU=
@@ -55,8 +57,8 @@ github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkp
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
 github.com/fasthttp/websocket v1.5.10 h1:bc7NIGyrg1L6sd5pRzCIbXpro54SZLEluZCu0rOpcN4=
 github.com/fasthttp/websocket v1.5.10/go.mod h1:BwHeuXGWzCW1/BIKUKD3+qfCl+cTdsHu/f243NcAI/Q=
-github.com/fiatjaf/eventstore v0.13.0 h1:60cE/oIUdVHoE6aOayjIyubiQIhMW6jezLjdvcl29Y4=
-github.com/fiatjaf/eventstore v0.13.0/go.mod h1:XOl5B6WGBX1a0ww6s3WT94QVOmye/6zDTtyWHVtHQ5U=
+github.com/fiatjaf/eventstore v0.14.0 h1:eAyugJGFRCrXYJLCc2nC/BIApmBbQN/Z4dxvNz1SIvI=
+github.com/fiatjaf/eventstore v0.14.0/go.mod h1:XOl5B6WGBX1a0ww6s3WT94QVOmye/6zDTtyWHVtHQ5U=
 github.com/fiatjaf/khatru v0.11.0 h1:6f0iCNMCsg3Ka/L+zbn7iPwnueFPqnvqECrVsdrOVag=
 github.com/fiatjaf/khatru v0.11.0/go.mod h1:GfKKAR27sMxBmepv709QnL7C9lEmlhaj41LFm/ueATc=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
