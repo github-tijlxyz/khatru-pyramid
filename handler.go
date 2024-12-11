@@ -10,10 +10,11 @@ import (
 )
 
 func inviteTreeHandler(w http.ResponseWriter, r *http.Request) {
+	loggedUser := getLoggedUser(r)
 	content := inviteTreePageHTML(r.Context(), InviteTreePageParams{
-		loggedUser: getLoggedUser(r),
+		loggedUser: loggedUser,
 	})
-	htmlgo.Fprint(w, baseHTML(content), r.Context())
+	htmlgo.Fprint(w, baseHTML(content, loggedUser), r.Context())
 }
 
 func addToWhitelistHandler(w http.ResponseWriter, r *http.Request) {
@@ -47,6 +48,41 @@ func removeFromWhitelistHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	content := inviteTreeComponent(r.Context(), "", loggedUser)
 	htmlgo.Fprint(w, content, r.Context())
+}
+
+// this deletes all events from users not in the relay anymore
+func cleanupStuffFromExcludedUsersHandler(w http.ResponseWriter, r *http.Request) {
+	loggedUser := getLoggedUser(r)
+	if loggedUser != s.RelayPubkey {
+		http.Error(w, "unauthorized, only the relay owner can do this", 403)
+		return
+	}
+
+	oldLimit := db.MaxLimit
+	db.MaxLimit = 999999
+	ch, err := db.QueryEvents(r.Context(), nostr.Filter{Limit: db.MaxLimit})
+	if err != nil {
+		http.Error(w, "failed to query", 500)
+		return
+	}
+	db.MaxLimit = oldLimit
+
+	count := 0
+
+	for evt := range ch {
+		if isPublicKeyInWhitelist(evt.PubKey) {
+			continue
+		}
+
+		if err := db.DeleteEvent(r.Context(), evt); err != nil {
+			http.Error(w, fmt.Sprintf(
+				"failed to delete %s: %s -- stopping, %d events were deleted before this error", evt, err, count), 500)
+			return
+		}
+		count++
+	}
+
+	fmt.Fprintf(w, "deleted %d events", count)
 }
 
 func reportsViewerHandler(w http.ResponseWriter, r *http.Request) {

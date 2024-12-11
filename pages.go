@@ -9,8 +9,13 @@ import (
 
 const buttonClass = "rounded-md text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300"
 
-func baseHTML(inside HTMLComponent) HTMLComponent {
+func baseHTML(inside HTMLComponent, loggedUser string) HTMLComponent {
 	navItemClass := "text-gray-600 hover:bg-gray-200 rounded-md px-3 py-2 font-medium"
+
+	cleanupButton := Span("")
+	if loggedUser == s.RelayPubkey {
+		cleanupButton = A().Text("clear stuff").Href("/cleanup").Class(navItemClass)
+	}
 
 	return HTML(
 		Head(
@@ -30,6 +35,7 @@ func baseHTML(inside HTMLComponent) HTMLComponent {
 				A().Text("invite tree").Href("/").Class(navItemClass).Attr("hx-boost", "true", "hx-target", "main", "hx-select", "main"),
 				A().Text("browse").Href("/browse").Class(navItemClass),
 				A().Text("reports").Href("/reports").Class(navItemClass).Attr("hx-boost", "true", "hx-target", "main", "hx-select", "main"),
+				cleanupButton,
 				A().Text("").Href("#").Class(navItemClass).
 					Attr("_", `
 on click if my innerText is equal to "login" get window.nostr.signEvent({created_at: Math.round(Date.now()/1000), kind: 27235, tags: [['domain', "`+s.Domain+`"]], content: ''}) then get JSON.stringify(it) then set cookies['nip98'] to it otherwise call cookies.clear('nip98') end then call location.reload()
@@ -137,5 +143,6 @@ func reportsPageHTML(ctx context.Context, params ReportsPageParams) HTMLComponen
 			H1("reports received").Class("text-xl p-4"),
 			Div(items...),
 		),
+		params.loggedUser,
 	)
 }
