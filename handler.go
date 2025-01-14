@@ -6,15 +6,11 @@ import (
 
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/nbd-wtf/go-nostr/nip19"
-	"github.com/theplant/htmlgo"
 )
 
 func inviteTreeHandler(w http.ResponseWriter, r *http.Request) {
 	loggedUser := getLoggedUser(r)
-	content := inviteTreePageHTML(r.Context(), InviteTreePageParams{
-		loggedUser: loggedUser,
-	})
-	htmlgo.Fprint(w, baseHTML(content, loggedUser), r.Context())
+	inviteTreePage(loggedUser).Render(r.Context(), w)
 }
 
 func addToWhitelistHandler(w http.ResponseWriter, r *http.Request) {
@@ -35,8 +31,7 @@ func addToWhitelistHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	content := inviteTreeComponent(r.Context(), "", loggedUser)
-	htmlgo.Fprint(w, content, r.Context())
+	inviteTreeComponent("", loggedUser).Render(r.Context(), w)
 }
 
 func removeFromWhitelistHandler(w http.ResponseWriter, r *http.Request) {
@@ -46,8 +41,7 @@ func removeFromWhitelistHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to remove from whitelist: "+err.Error(), 500)
 		return
 	}
-	content := inviteTreeComponent(r.Context(), "", loggedUser)
-	htmlgo.Fprint(w, content, r.Context())
+	inviteTreeComponent("", loggedUser).Render(r.Context(), w)
 }
 
 // this deletes all events from users not in the relay anymore
@@ -95,11 +89,7 @@ func reportsViewerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	content := reportsPageHTML(r.Context(), ReportsPageParams{
-		reports:    events,
-		loggedUser: getLoggedUser(r),
-	})
-	htmlgo.Fprint(w, content, r.Context())
+	reportsPage(events, getLoggedUser(r)).Render(r.Context(), w)
 }
 
 func joubleHandler(w http.ResponseWriter, r *http.Request) {

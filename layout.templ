@@ -1,0 +1,59 @@
+package main
+
+templ layout(loggedUser string) {
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<title>{ s.RelayName }</title>
+			<script src="https://cdn.tailwindcss.com"></script>
+			<script src="https://unpkg.com/htmx.org@1.9.6"></script>
+			<script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+		</head>
+		<body class="max-w-screen-lg px-3 mx-auto">
+			<div class="mx-auto my-6 text-center">
+				<h1 class="font-bold text-2xl">{ s.RelayName }</h1>
+				if s.RelayDescription != "" {
+					<p class="text-lg">{ s.RelayDescription }</p>
+				}
+			</div>
+			<nav class="flex flex-1 items-center justify-center">
+				<a href="/" class="text-gray-600 hover:bg-gray-200 rounded-md px-3 py-2 font-medium" hx-boost="true" hx-target="main" hx-select="main">invite tree</a>
+				<a href="/browse" class="text-gray-600 hover:bg-gray-200 rounded-md px-3 py-2 font-medium">browse</a>
+				<a href="/reports" class="text-gray-600 hover:bg-gray-200 rounded-md px-3 py-2 font-medium" hx-boost="true" hx-target="main" hx-select="main">reports</a>
+				if loggedUser == s.RelayPubkey {
+					<a href="/cleanup" class="text-gray-600 hover:bg-gray-200 rounded-md px-3 py-2 font-medium">clear stuff</a>
+				}
+				<a
+					href="#"
+					class="text-gray-600 hover:bg-gray-200 rounded-md px-3 py-2 font-medium"
+					_="
+					on click if my innerText is equal to 'login'
+						get window.nostr.signEvent({created_at: Math.round(Date.now()/1000), kind: 27235, tags: [['domain', '{ s.Domain }']], content: ''})
+						then get JSON.stringify(it)
+						then set cookies['nip98'] to it
+					otherwise
+						call cookies.clear('nip98')
+					end
+					then call location.reload()
+
+					on load
+						get cookies['nip98']
+						then if it is undefined
+							set my innerText to 'login'
+						otherwise
+							set my innerText to 'logout'
+				"
+				></a>
+			</nav>
+			<main class="m-4">
+				{ children... }
+			</main>
+			<p class="text-end my-4 text-sm">
+				powered by
+				<a href="https://github.com/github-tijlxyz/khatru-pyramid" class="hover:underline cursor-pointer text-blue-500">khatru-pyramid</a>
+			</p>
+		</body>
+	</html>
+}

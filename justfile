@@ -1,8 +1,11 @@
 dev:
-    ag -l --go | entr -r godotenv go run .
+    fd 'go|templ' | entr -r bash -c 'just templ && godotenv go run .'
 
-build:
+build: templ
     CC=musl-gcc go build -ldflags='-linkmode external -extldflags "-static"' -o ./khatru-pyramid
+
+templ:
+    templ generate
 
 deploy target: build
     ssh root@{{target}} 'systemctl stop pyramid';

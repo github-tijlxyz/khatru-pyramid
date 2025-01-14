@@ -2,3 +2,4 @@ users.json
 khatru-pyramid
 .env
 db
+*_templ.go

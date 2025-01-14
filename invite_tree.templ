@@ -1,0 +1,69 @@
+package main
+
+import (
+	"fmt"
+
+	"github.com/nbd-wtf/go-nostr/sdk"
+)
+
+templ inviteTreePage(loggedUser string) {
+	@layout(loggedUser) {
+		<div>
+			if loggedUser != "" && (loggedUser == s.RelayPubkey || !hasInvitedAtLeast(loggedUser, s.MaxInvitesPerPerson)) {
+				<form
+					hx-post="/add-to-whitelist"
+					hx-trigger="submit"
+					hx-target="#tree"
+					_="on htmx:afterRequest(elt, successful) if successful and elt is I call I.reset()"
+					class="flex justify-center"
+				>
+					<input
+						type="text"
+						name="pubkey"
+						placeholder="npub1..."
+						class="w-96 rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+					/>
+					<button
+						type="submit"
+						class="rounded-md text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 ml-2 p-2 bg-white hover:bg-gray-50"
+					>
+						invite
+					</button>
+				</form>
+			}
+			<div id="tree" class="mt-3 flex justify-center">
+				@inviteTreeComponent("", loggedUser)
+			</div>
+		</div>
+	}
+}
+
+templ inviteTreeComponent(inviter string, loggedUser string) {
+	<ul>
+		for pubkey, invitedBy := range whitelist {
+			if invitedBy == inviter {
+				<li class="ml-6">
+					@userNameComponent(sys.FetchProfileMetadata(ctx, pubkey))
+					if isAncestorOf(loggedUser, pubkey) && loggedUser != "" {
+						<button
+							class="rounded-md text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 px-2 ml-2 bg-red-100 hover:bg-red-300"
+							hx-post="/remove-from-whitelist"
+							hx-trigger="click"
+							hx-target="#tree"
+							hx-vals={ fmt.Sprintf(`{"pubkey": "%s"}`, pubkey) }
+						>
+							remove
+						</button>
+					}
+					@inviteTreeComponent(pubkey, loggedUser)
+				</li>
+			}
+		}
+	</ul>
+}
+
+templ userNameComponent(profile sdk.ProfileMetadata) {
+	<a href={ templ.URL("https://nosta.me/" + profile.Npub()) } target="_blank" class="font-mono py-1">
+		<span title={ profile.Npub() }>{ profile.ShortName() }</span>
+	</a>
+}
