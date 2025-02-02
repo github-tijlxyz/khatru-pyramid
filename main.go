@@ -95,8 +95,8 @@ func main() {
 	relay.DeleteEvent = append(relay.DeleteEvent, db.DeleteEvent)
 	relay.RejectEvent = append(relay.RejectEvent,
 		policies.PreventLargeTags(100),
-		policies.PreventTooManyIndexableTags(8, []int{3, 10002}, nil),
-		policies.PreventTooManyIndexableTags(1000, nil, []int{3, 10002}),
+		policies.PreventTooManyIndexableTags(9, []int{3}, nil),
+		policies.PreventTooManyIndexableTags(1200, nil, []int{3}),
 		policies.RestrictToSpecifiedKinds(true, supportedKinds...),
 		rejectEventsFromUsersNotInWhitelist,
 		validateAndFilterReports,
