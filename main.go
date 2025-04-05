@@ -156,7 +156,7 @@ func getLoggedUser(r *http.Request) string {
 		if evtj, err := url.QueryUnescape(cookie.Value); err == nil {
 			var evt nostr.Event
 			if err := json.Unmarshal([]byte(evtj), &evt); err == nil {
-				if tag := evt.Tags.GetFirst([]string{"domain", ""}); tag != nil && (*tag)[1] == s.Domain {
+				if tag := evt.Tags.Find("domain"); tag != nil && tag[1] == s.Domain {
 					if ok, _ := evt.CheckSignature(); ok {
 						return evt.PubKey
 					}

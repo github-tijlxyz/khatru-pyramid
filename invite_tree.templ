@@ -2,14 +2,12 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/nbd-wtf/go-nostr/sdk"
 )
 
 templ inviteTreePage(loggedUser string) {
 	@layout(loggedUser) {
 		<div>
-			if loggedUser != "" && (loggedUser == s.RelayPubkey || !hasInvitedAtLeast(loggedUser, s.MaxInvitesPerPerson)) {
+			if canInviteMore(loggedUser) {
 				<form
 					hx-post="/add-to-whitelist"
 					hx-trigger="submit"
@@ -43,7 +41,9 @@ templ inviteTreeComponent(inviter string, loggedUser string) {
 		for pubkey, invitedBy := range whitelist {
 			if invitedBy == inviter {
 				<li class="ml-6">
-					@userNameComponent(sys.FetchProfileMetadata(ctx, pubkey))
+					<a href={ templ.URL("https://njump.me/p/" + pubkey) } target="_blank" class="font-mono py-1">
+						<nostr-name pubkey={ pubkey }>{ pubkey }</nostr-name>
+					</a>
 					if isAncestorOf(loggedUser, pubkey) && loggedUser != "" {
 						<button
 							class="rounded-md text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 px-2 ml-2 bg-red-100 hover:bg-red-300"
@@ -60,10 +60,4 @@ templ inviteTreeComponent(inviter string, loggedUser string) {
 			}
 		}
 	</ul>
-}
-
-templ userNameComponent(profile sdk.ProfileMetadata) {
-	<a href={ templ.URL("https://nosta.me/" + profile.Npub()) } target="_blank" class="font-mono py-1">
-		<span title={ profile.Npub() }>{ profile.ShortName() }</span>
-	</a>
 }

@@ -33,17 +33,29 @@ func isPublicKeyInWhitelist(pubkey string) bool {
 	return ok
 }
 
-func hasInvitedAtLeast(ancestor string, target int) bool {
+func canInviteMore(pubkey string) bool {
+	if pubkey == "" {
+		return false
+	}
+
+	if pubkey == s.RelayPubkey {
+		return true
+	}
+
+	if !isPublicKeyInWhitelist(pubkey) {
+		return false
+	}
+
 	count := 0
 	for _, inviter := range whitelist {
-		if inviter == ancestor {
+		if inviter == pubkey {
 			count++
 		}
-		if count >= target {
-			return true
+		if count >= s.MaxInvitesPerPerson {
+			return false
 		}
 	}
-	return false
+	return true
 }
 
 func isAncestorOf(ancestor string, target string) bool {

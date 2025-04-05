@@ -21,7 +21,7 @@ func addToWhitelistHandler(w http.ResponseWriter, r *http.Request) {
 		pubkey = value.(string)
 	}
 
-	if loggedUser != s.RelayPubkey && hasInvitedAtLeast(loggedUser, s.MaxInvitesPerPerson) {
+	if !canInviteMore(loggedUser) {
 		http.Error(w, fmt.Sprintf("cannot invite more than %d", s.MaxInvitesPerPerson), 403)
 		return
 	}
@@ -108,13 +108,13 @@ window.relayGroups = [{
 }]
 window.hideRelaySettings = true
 </script>
-    <script type="module" crossorigin src="https://unpkg.com/jouble/dist/index.js"></script>
-    <link rel="stylesheet" crossorigin href="https://unpkg.com/jouble/dist/index.css">
+    <script type="module" crossorigin src="https://cdn.jsdelivr.net/npm/jouble@0.0.6/dist/index.js"></script>
+    <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/npm/jouble@0.0.6/dist/index.css">
   </head>
 
   <body>
     <div id="root"></div>
-    <script src="https://unpkg.com/window.nostr.js/dist/window.nostr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/window.nostr.js@0.4.7/dist/window.nostr.min.js"></script>
   </body>
 </html>
 `)

@@ -8,10 +8,11 @@ templ layout(loggedUser string) {
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
 			<title>{ s.RelayName }</title>
 			<script src="https://cdn.tailwindcss.com"></script>
-			<script src="https://unpkg.com/htmx.org@1.9.6"></script>
-			<script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+			<script src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.12/dist/htmx.min.js"></script>
+			<script src="https://cdn.jsdelivr.net/npm/hyperscript.org@0.9.14/dist/_hyperscript.min.js"></script>
+			<script src="https://cdn.jsdelivr.net/npm/nostr-web-components@0.0.12/dist/nostr-name.js"></script>
 		</head>
-		<body class="max-w-screen-lg px-3 mx-auto">
+		<body class="px-3 mx-auto">
 			<div class="mx-auto my-6 text-center">
 				<h1 class="font-bold text-2xl">{ s.RelayName }</h1>
 				if s.RelayDescription != "" {
@@ -28,24 +29,23 @@ templ layout(loggedUser string) {
 				<a
 					href="#"
 					class="text-gray-600 hover:bg-gray-200 rounded-md px-3 py-2 font-medium"
-					_="
+					_={ `
 					on click if my innerText is equal to 'login'
-						get window.nostr.signEvent({created_at: Math.round(Date.now()/1000), kind: 27235, tags: [['domain', '{ s.Domain }']], content: ''})
+						get window.nostr.signEvent({created_at: Math.round(Date.now()/1000), kind: 27235, tags: [['domain', '`+ s.Domain+ `']], content: ''})
 						then get JSON.stringify(it)
 						then set cookies['nip98'] to it
 					otherwise
 						call cookies.clear('nip98')
 					end
 					then call location.reload()
-
-					on load
-						get cookies['nip98']
-						then if it is undefined
-							set my innerText to 'login'
-						otherwise
-							set my innerText to 'logout'
-				"
-				></a>
+				` }
+				>
+					if loggedUser != "" {
+						logout
+					} else {
+						login
+					}
+				</a>
 			</nav>
 			<main class="m-4">
 				{ children... }
@@ -54,6 +54,7 @@ templ layout(loggedUser string) {
 				powered by
 				<a href="https://github.com/github-tijlxyz/khatru-pyramid" class="hover:underline cursor-pointer text-blue-500">khatru-pyramid</a>
 			</p>
+			<script src="https://cdn.jsdelivr.net/npm/window.nostr.js@0.4.7/dist/window.nostr.min.js"></script>
 		</body>
 	</html>
 }

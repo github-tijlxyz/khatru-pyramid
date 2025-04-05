@@ -9,9 +9,9 @@ templ reportsPage(reports chan *nostr.Event, loggedUser string) {
 			<div>
 				for report := range reports {
 					<div>
-						if e := report.Tags.GetFirst([]string{"e", ""}); e != nil {
+						if e := report.Tags.Find("e"); e != nil {
 							@eventReportComponent(e, report)
-						} else if p := report.Tags.GetFirst([]string{"p", ""}); p != nil {
+						} else if p := report.Tags.Find("p"); p != nil {
 							@profileReportComponent(p, report)
 						}
 					</div>
@@ -21,13 +21,13 @@ templ reportsPage(reports chan *nostr.Event, loggedUser string) {
 	}
 }
 
-templ eventReportComponent(e *nostr.Tag, report *nostr.Event) {
-	if res, _ := sys.StoreRelay.QuerySync(ctx, nostr.Filter{IDs: []string{(*e)[1]}}); len(res) > 0 {
+templ eventReportComponent(e nostr.Tag, report *nostr.Event) {
+	if res, _ := sys.StoreRelay.QuerySync(ctx, nostr.Filter{IDs: []string{e[1]}}); len(res) > 0 {
 		<div>
 			<div class="font-lg">
 				<span class="font-semibold">
-					if len(*e) >= 3 {
-						{ (*e)[2] }
+					if len(e) >= 3 {
+						{ e[2] }
 					}
 				</span>
 				{ " report" }
@@ -42,13 +42,13 @@ templ eventReportComponent(e *nostr.Tag, report *nostr.Event) {
 	}
 }
 
-templ profileReportComponent(p *nostr.Tag, report *nostr.Event) {
-	if isPublicKeyInWhitelist((*p)[1]) {
+templ profileReportComponent(p nostr.Tag, report *nostr.Event) {
+	if isPublicKeyInWhitelist(p[1]) {
 		<div>
 			<div class="font-lg">
 				<span class="font-semibold">
-					if len(*p) >= 3 {
-						{ (*p)[2] }
+					if len(p) >= 3 {
+						{ p[2] }
 					}
 				</span>
 				{ " report" }
@@ -57,7 +57,9 @@ templ profileReportComponent(p *nostr.Tag, report *nostr.Event) {
 			<div class="p-3">{ report.Content }</div>
 			<div>
 				profile reported:
-				@userNameComponent(sys.FetchProfileMetadata(ctx, (*p)[1]))
+				<a href={ templ.URL("https://njump.me/p/" + report.PubKey) } target="_blank" class="font-mono py-1">
+					<nostr-name pubkey={ report.PubKey }>{ report.PubKey }</nostr-name>
+				</a>
 			</div>
 		</div>
 	}

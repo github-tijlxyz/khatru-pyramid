@@ -11,7 +11,7 @@ import (
 func allowPubKeyHandler(ctx context.Context, pubkey, reason string) error {
 	loggedUser := khatru.GetAuthed(ctx)
 
-	if loggedUser != s.RelayPubkey && hasInvitedAtLeast(loggedUser, s.MaxInvitesPerPerson) {
+	if !canInviteMore(loggedUser) {
 		return fmt.Errorf("cannot invite more than %d", s.MaxInvitesPerPerson)
 	}
 	if err := addToWhitelist(pubkey, loggedUser); err != nil {
