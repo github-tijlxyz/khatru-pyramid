@@ -37,11 +37,11 @@ var supportedKinds = []uint16{
 	1111,
 	1984,
 	1985,
-	17375,
 	7375,
 	7376,
 	9321,
 	9735,
+	9802,
 	10000,
 	10001,
 	10002,
@@ -79,15 +79,15 @@ var supportedKinds = []uint16{
 
 func validateAndFilterReports(ctx context.Context, event *nostr.Event) (reject bool, msg string) {
 	if event.Kind == 1984 {
-		if e := event.Tags.GetFirst([]string{"e", ""}); e != nil {
+		if e := event.Tags.Find("e"); e != nil {
 			// event report: check if the target event is here
-			res, _ := sys.StoreRelay.QuerySync(ctx, nostr.Filter{IDs: []string{(*e)[1]}})
+			res, _ := sys.StoreRelay.QuerySync(ctx, nostr.Filter{IDs: []string{e[1]}})
 			if len(res) == 0 {
 				return true, "we don't know anything about the target event"
 			}
-		} else if p := event.Tags.GetFirst([]string{"p", ""}); p != nil {
+		} else if p := event.Tags.Find("p"); p != nil {
 			// pubkey report
-			if !isPublicKeyInWhitelist((*p)[1]) {
+			if !isPublicKeyInWhitelist(p[1]) {
 				return true, "target pubkey is not a user of this relay"
 			}
 		} else {
