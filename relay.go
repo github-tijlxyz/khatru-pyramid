@@ -75,6 +75,7 @@ var supportedKinds = []uint16{
 	31923,
 	31924,
 	31925,
+	39701,
 }
 
 func validateAndFilterReports(ctx context.Context, event *nostr.Event) (reject bool, msg string) {

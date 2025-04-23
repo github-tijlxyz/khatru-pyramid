@@ -43,6 +43,8 @@ var (
 			switch kind {
 			case 7:
 				return true, true
+			case 1111:
+				return true, false
 			default:
 				return false, false
 			}
@@ -62,6 +64,8 @@ func main() {
 		log.Fatal().Err(err).Msg("couldn't process envconfig")
 		return
 	}
+
+	relay.ServiceURL = "wss://" + s.Domain
 
 	// enable negentropy
 	relay.Negentropy = true
