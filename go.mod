@@ -4,8 +4,8 @@ go 1.24.1
 
 require (
 	github.com/a-h/templ v0.3.857
-	github.com/fiatjaf/eventstore v0.16.4
-	github.com/fiatjaf/khatru v0.17.7
+	github.com/fiatjaf/eventstore v0.16.7
+	github.com/fiatjaf/khatru v0.18.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/nbd-wtf/go-nostr v0.51.10
 	github.com/rs/zerolog v1.33.0
@@ -44,7 +44,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/puzpuzpuz/xsync/v3 v3.5.1 // indirect
 	github.com/rs/cors v1.11.1 // indirect
-	github.com/savsgio/gotils v0.0.0-20240704082632-aef3928b8a38 // indirect
+	github.com/savsgio/gotils v0.0.0-20250408102913-196191ec6287 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
@@ -53,6 +53,6 @@ require (
 	github.com/valyala/fasthttp v1.60.0 // indirect
 	golang.org/x/arch v0.16.0 // indirect
 	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0 // indirect
-	golang.org/x/net v0.38.0 // indirect
+	golang.org/x/net v0.39.0 // indirect
 	golang.org/x/sys v0.32.0 // indirect
 )
