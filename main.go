@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/fiatjaf/eventstore/lmdb"
 	"github.com/fiatjaf/khatru"
@@ -90,7 +91,13 @@ func main() {
 	}
 	relay.Info.Software = "https://github.com/github-tijlxyz/khatru-pyramid"
 
-	policies.ApplySaneDefaults(relay)
+	relay.RejectFilter = append(relay.RejectFilter,
+		policies.NoComplexFilters,
+		policies.FilterIPRateLimiter(20, time.Minute, 100),
+	)
+	relay.RejectConnection = append(relay.RejectConnection,
+		policies.ConnectionRateLimiter(1, time.Minute*5, 100),
+	)
 
 	relay.StoreEvent = append(relay.StoreEvent, db.SaveEvent)
 	relay.QueryEvents = append(relay.QueryEvents, db.QueryEvents)
