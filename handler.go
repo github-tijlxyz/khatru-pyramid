@@ -91,31 +91,3 @@ func reportsViewerHandler(w http.ResponseWriter, r *http.Request) {
 
 	reportsPage(events, getLoggedUser(r)).Render(r.Context(), w)
 }
-
-func joubleHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, `
-<!doctype html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pyramid</title>
-    <script>
-window.relayGroups = [{
-  groupName: 'pyramid',
-  relayUrls: [location.href.replace('http', 'ws').replace('/browse', '')],
-  isActive: true,
-}]
-window.hideRelaySettings = true
-</script>
-    <script type="module" crossorigin src="https://cdn.jsdelivr.net/npm/jouble@0.0.6/dist/index.js"></script>
-    <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/npm/jouble@0.0.6/dist/index.css">
-  </head>
-
-  <body>
-    <div id="root"></div>
-    <script src="https://cdn.jsdelivr.net/npm/window.nostr.js@0.4.7/dist/window.nostr.min.js"></script>
-  </body>
-</html>
-`)
-}

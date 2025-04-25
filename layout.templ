@@ -21,7 +21,7 @@ templ layout(loggedUser string) {
 			</div>
 			<nav class="flex flex-1 items-center justify-center">
 				<a href="/" class="text-gray-600 hover:bg-gray-200 rounded-md px-3 py-2 font-medium" hx-boost="true" hx-target="main" hx-select="main">invite tree</a>
-				<a href="/browse" class="text-gray-600 hover:bg-gray-200 rounded-md px-3 py-2 font-medium">browse</a>
+				<a target="_blank" class="text-gray-600 hover:bg-gray-200 rounded-md px-3 py-2 font-medium" _="on load set my href to `https://jumble.social/?r=${location.hostname}`">browse</a>
 				<a href="/reports" class="text-gray-600 hover:bg-gray-200 rounded-md px-3 py-2 font-medium" hx-boost="true" hx-target="main" hx-select="main">reports</a>
 				if loggedUser == s.RelayPubkey {
 					<a href="/cleanup" class="text-gray-600 hover:bg-gray-200 rounded-md px-3 py-2 font-medium">clear stuff</a>
