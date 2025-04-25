@@ -1,12 +1,13 @@
 package main
 
 import "github.com/nbd-wtf/go-nostr"
+import "github.com/nbd-wtf/go-nostr/nip19"
 
 templ reportsPage(reports chan *nostr.Event, loggedUser string) {
 	@layout(loggedUser) {
-		<div>
+		<div class="max-w-4xl mx-auto">
 			<h1 class="text-xl p-4">reports received</h1>
-			<div>
+			<div class="space-y-4 p-4">
 				for report := range reports {
 					<div>
 						if e := report.Tags.Find("e"); e != nil {
@@ -23,28 +24,36 @@ templ reportsPage(reports chan *nostr.Event, loggedUser string) {
 
 templ eventReportComponent(e nostr.Tag, report *nostr.Event) {
 	if res, _ := sys.StoreRelay.QuerySync(ctx, nostr.Filter{IDs: []string{e[1]}}); len(res) > 0 {
-		<div>
-			<div class="font-lg">
-				<span class="font-semibold">
-					if len(e) >= 3 {
-						{ e[2] }
-					}
-				</span>
-				{ " report" }
+		<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+			<div class="flex justify-between items-start">
+				<div class="font-lg">
+					<span class="font-semibold">
+						if len(e) >= 3 {
+							{ e[2] }
+						}
+					</span>
+					{ " report" }
+				</div>
+				<div class="text-sm text-gray-500">
+					{ report.CreatedAt.Time().Format("Jan 2, 2006 3:04 PM") }
+				</div>
 			</div>
-			<div>by @userNameComponent(sys.FetchProfileMetadata(ctx, report.PubKey))</div>
-			<div class="p-3">{ report.Content }</div>
-			<div>
-				event reported:
-				<div class="text-mono">{ res[0].String() }</div>
+			{{ npub, _ := nip19.EncodePublicKey(report.PubKey) }}
+			<div class="mt-2 text-sm text-gray-600">by <a class="hover:underline" title={ report.PubKey } href={ templ.SafeURL("nostr:" + npub) }><nostr-name pubkey={ report.PubKey }></nostr-name></a></div>
+			if report.Content != "" {
+				<div class="mt-3 p-3 bg-gray-50 rounded">{ report.Content }</div>
+			}
+			<div class="mt-3">
+				<div class="text-sm text-gray-600">event reported:</div>
+				<div class="mt-1 font-mono text-sm bg-gray-50 p-2 rounded overflow-auto whitespace-pre-wrap break-all">{ res[0].String() }</div>
 			</div>
 		</div>
 	}
 }
 
 templ profileReportComponent(p nostr.Tag, report *nostr.Event) {
-	if isPublicKeyInWhitelist(p[1]) {
-		<div>
+	<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+		<div class="flex justify-between items-start">
 			<div class="font-lg">
 				<span class="font-semibold">
 					if len(p) >= 3 {
@@ -53,14 +62,23 @@ templ profileReportComponent(p nostr.Tag, report *nostr.Event) {
 				</span>
 				{ " report" }
 			</div>
-			<div>by @userNameComponent(sys.FetchProfileMetadata(ctx, report.PubKey))</div>
-			<div class="p-3">{ report.Content }</div>
-			<div>
-				profile reported:
-				<a href={ templ.URL("https://njump.me/p/" + report.PubKey) } target="_blank" class="font-mono py-1">
-					<nostr-name pubkey={ report.PubKey }>{ report.PubKey }</nostr-name>
+			<div class="text-sm text-gray-500">
+				{ report.CreatedAt.Time().Format("Jan 2, 2006 3:04 PM") }
+			</div>
+		</div>
+		{{ npub, _ := nip19.EncodePublicKey(report.PubKey) }}
+		<div class="mt-2 text-sm text-gray-600">by <a class="hover:underline" title={ report.PubKey } href={ templ.SafeURL("nostr:" + npub) }><nostr-name pubkey={ report.PubKey }></nostr-name></a></div>
+		if report.Content != "" {
+			<div class="mt-3 p-3 bg-gray-50 rounded">{ report.Content }</div>
+		}
+		<div class="mt-3">
+			<div class="text-sm text-gray-600">profile reported:</div>
+			<div class="mt-1">
+				{{ npubt, _ := nip19.EncodePublicKey(p[1]) }}
+				<a href={ templ.URL("nostr:" + npubt) } target="_blank" class="text-sm hover:underline">
+					<nostr-name pubkey={ p[1] }></nostr-name>
 				</a>
 			</div>
 		</div>
-	}
+	</div>
 }
